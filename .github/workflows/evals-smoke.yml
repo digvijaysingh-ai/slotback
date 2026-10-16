@@ -1,0 +1,40 @@
+# Release gate incl. conversation scenarios on ElevenLabs Tests. MANUAL: each run spends
+# ElevenLabs credits (~650 per simulated conversation). Needs repo secrets
+# ELEVENLABS_API_KEY, DEMO_ACCESS_CODE and variables ELEVENLABS_INBOUND_AGENT_ID,
+# SLOTBACK_API_URL. ERRORED (a scenario could not run) fails the gate (D12).
+name: evals-smoke
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: slotback_evals
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/slotback_evals
+      ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+      ELEVENLABS_INBOUND_AGENT_ID: ${{ vars.ELEVENLABS_INBOUND_AGENT_ID }}
+      SLOTBACK_API_URL: ${{ vars.SLOTBACK_API_URL }}
+      DEMO_ACCESS_CODE: ${{ secrets.DEMO_ACCESS_CODE }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - run: uv sync --locked
+      - run: uv run python -m evals.run --smoke
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-report
+          path: evals/results/latest.json

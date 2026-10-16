@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ t.verify_title }}{% endblock %}
+{% block main %}
+<div class="head"><h1>{{ t.verify_title }}</h1></div>
+<p class="lede muted" style="font-size:16px">Upload an evidence bundle (ledger + list snapshots + signed head). Nothing is stored. The check runs the same verifier as the command line: <span class="mono">slotledger verify bundle.zip</span>.</p>
+{% if static_mode %}<div class="alert" style="margin-top:20px"><b>Static snapshot.</b> Uploading needs the server version. Download the sample bundle and run <span class="mono">slotledger verify showcase-2026-10-16.zip --trusted-key KEY</span>, or see the report below, produced by the same verifier.</div>
+<p><a class="btn" href="/evidence/showcase-2026-10-16.zip" download>Download the sample bundle ↓</a></p>
+<ul class="checks" id="static-report" data-src="verify-sample.json"></ul>
+{% else %}<form id="verify-form" class="drop" style="margin-top:20px">
+  <p><b>Drop a bundle here</b> or choose a file (zip, max 5 MB)</p>
+  <p style="margin-top:12px"><input type="file" id="bundle" accept=".zip" required></p>
+  <p style="margin-top:12px"><label for="trusted">Trusted public key (the hospital's)</label>
+    <input id="trusted" style="width:100%;font-family:var(--mono);font-size:12px" value="{{ trusted_key or '' }}"></p>
+  <p style="margin-top:16px"><button class="btn primary" type="submit">Verify</button>
+  <a class="btn ghost" href="/evidence/showcase-2026-10-16.zip" download>Try the sample bundle ↓</a></p>
+</form>
+<div id="verify-progress" class="muted" role="status" hidden>Checking…</div>
+<ul class="checks" id="verify-out" aria-live="polite"></ul>{% endif %}
+<h3>What each check proves</h3>
+<table><tbody>
+  <tr><td><b>chain</b></td><td>No event was changed, inserted, removed or reordered after it was recorded.</td></tr>
+  <tr><td><b>identity_before_detail</b></td><td>Every appointment detail was given only after that patient's identity was verified on the same call.</td></tr>
+  <tr><td><b>list_order</b></td><td>Every freed slot was offered in the hospital's waiting-list order; a patient was skipped only with a logged reason.</td></tr>
+  <tr><td><b>head</b></td><td>The ledger ends exactly where the signed daily head says, signed with the key the hospital holds.</td></tr>
+</tbody></table>
+<p class="muted" style="font-size:13px;margin-top:12px">Tamper-evident, not proof of truth: billing still reconciles against the hospital's own booking system (docs/05).</p>
+{% endblock %}

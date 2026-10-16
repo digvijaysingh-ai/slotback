@@ -1,0 +1,23 @@
+{
+  "tools": {
+    "record_disclosure": "tool_8001m52ma2e1fzradj7zjff0cpxq",
+    "verify_identity": "tool_2901m52m9w2aevcvcmqpnn03d5k4",
+    "get_appointment": "tool_3901m52m9efff1ytptfw9s7y95zk",
+    "confirm_appointment": "tool_6601m52m9etafw9ajvn8nbgj0n9q",
+    "cancel_appointment": "tool_4501m52m9f7eey28k3v8nf332nd9",
+    "list_alternative_slots": "tool_8001m52m9gcredcva34mtez90gy1",
+    "reschedule": "tool_3001m52m9gqpehbr9cxswe5s0dwk",
+    "offer_backfill": "tool_9801m52m9h3nfm5s3c7303x1wfb0",
+    "accept_backfill": "tool_7201m52m9hgtfrsas69d0wst2m0z",
+    "decline_backfill": "tool_0101m52m9jv9ew0aa2169mbe5hhm",
+    "transfer_to_human": "tool_0701m52m9k64fsbsmawd0e60kbhs",
+    "opt_out": "tool_2501m52m9kmtfpz9mbavc97yy0n2",
+    "log_outcome": "tool_3501m52mb524e3390899hb94ygtv"
+  },
+  "agents": {
+    "inbound-demo": "agent_3301m52mb5gtegr93g0xbd3eemen",
+    "outbound-demo": "agent_6401m52mbwg2fy6tjtma0pyv809h"
+  },
+  "secret_id": "pwwJ5FvbMLozg6FqZ251",
+  "phone_number_id": "phnum_2501m533esxxfpgaemreez5tsmbs"
+}

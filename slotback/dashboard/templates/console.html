@@ -1,0 +1,77 @@
+{% extends "base.html" %}{% from "macros.html" import tag, val, status %}
+{% block title %}{{ t.nav.console }}{% endblock %}
+{% block main %}
+<div class="head">
+  <h1>{{ t.console_title }}</h1>
+  {% if h == 'showcase' %}<span class="badge-sim">▲ SIMULATED</span>{% else %}<span class="tag meas">Live demo</span>{% endif %}
+  <div class="right"{% if static_mode %} hidden{% endif %}>
+    <a class="btn {{ 'primary' if h == 'showcase' }}" href="?h=showcase">Showcase day</a>
+    <a class="btn {{ 'primary' if h != 'showcase' }}" href="?h=live">Live demo</a>
+  </div>
+</div>
+
+{% for level, msg in alerts %}<div class="alert {{ level }}"><b>{{ msg }}.</b></div>{% endfor %}
+{% if paused %}<div class="alert warn"><b>Calling paused (kill switch).</b> Calls in progress finish; no new calls start.</div>{% endif %}
+
+<div class="metrics">
+  {% for key, label in [("answered","Answered"),("voicemail","Voicemail · callback number only"),("no_answer","No answer")] %}
+  <div class="metric"><div class="lab">{{ label }}</div><div class="num md">{{ counts.get(key, 0) }}</div>{% if h == 'showcase' %}<span class="tag sim">Simulated</span>{% endif %}</div>
+  {% endfor %}
+  <div class="metric"><div class="lab">Cost per recovered slot</div><div class="num md">€{{ val(reg, 'cost_per_recovered_slot_eur', '{:.2f}') }}</div>{{ tag(reg, 'cost_per_recovered_slot_eur') }}</div>
+</div>
+
+<h3>Call board</h3>
+<form method="get" class="head" style="margin-bottom:12px"{% if static_mode %} hidden{% endif %}>
+  <input type="hidden" name="h" value="{{ h }}">
+  <label for="status" style="margin:0">Status</label>
+  <select id="status" name="status" onchange="this.form.submit()">
+    {% for s in ["all"] + statuses %}<option value="{{ s }}" {{ 'selected' if s == status }}>{{ s|replace('_',' ') }}</option>{% endfor %}
+  </select>
+</form>
+{% if calls %}
+<table>
+  <thead><tr><th>Patient</th><th>Purpose</th><th>Specialty</th><th>Status</th><th>Safeguards</th><th class="num">Started</th></tr></thead>
+  <tbody>
+  {% for c in calls %}
+  <tr class="link"><td class="mono"><a href="/calls/{{ c.call_id }}">{{ c.pid }}</a></td>
+    <td>{{ c.purpose }}{% if c.rank %} · r{{ c.rank }}{% endif %}</td>
+    <td>{{ c.specialty }}</td><td>{{ status(c.outcome) }}</td>
+    <td>{% for m in c.care %}<span class="care">◆ {{ m }}</span> {% endfor %}</td>
+    <td class="num">{{ c.started }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+<p class="muted" style="font-size:13px;margin-top:8px">Specialty stays "—" until identity is verified, in the UI too. Page {{ page }} of {{ pages }} · {{ total }} calls.
+{% if page > 1 %}<a href="{{ 'console-p' ~ (page - 1) ~ '.html' if static_mode else '?h=' ~ h ~ '&status=' ~ status ~ '&p=' ~ (page - 1) }}">← newer</a>{% endif %}
+{% if page < pages %}<a href="{{ 'console-p' ~ (page + 1) ~ '.html' if static_mode else '?h=' ~ h ~ '&status=' ~ status ~ '&p=' ~ (page + 1) }}">older →</a>{% endif %}</p>
+{% else %}
+<div class="empty"><b>No calls yet.</b>{% if h != 'showcase' %}Start a session on <a href="/try">Try</a> to see it appear here.{% else %}The showcase day hasn't been loaded.{% endif %}</div>
+{% endif %}
+
+<div class="grid2">
+  <section>
+    <h3>{{ t.exceptions }}</h3>
+    {% if handoffs %}<ul class="checks">{% for ts, cid, reason in handoffs %}<li><span class="care">◆ Handed to a human</span> <a href="/calls/{{ cid }}">{{ ts[11:16] }}</a> · {{ reason }}</li>{% endfor %}</ul>
+    {% else %}<div class="empty">{{ t.no_exceptions }}</div>{% endif %}
+  </section>
+  <section>
+    <h3>{{ t.freed_feed }}</h3>
+    {% if slots %}<table><thead><tr><th>Slot</th><th>Specialty</th><th>Status</th><th class="num">Rank</th></tr></thead><tbody>
+    {% for s in slots %}<tr><td class="mono">{{ s.slot }}</td><td>{{ s.specialty }}</td><td>{{ status(s.status) }}</td><td class="num">{{ s.rank }} / {{ s.depth }}</td></tr>{% endfor %}
+    </tbody></table>{% else %}<div class="empty">No slots freed yet. Freed slots appear here as patients cancel.</div>{% endif %}
+  </section>
+</div>
+
+<h3>Tool latency (live process)</h3>
+{% if stats %}<table><thead><tr><th>Tool</th><th class="num">Calls</th><th class="num">Errors</th><th class="num">p50 ms</th><th class="num">p95 ms</th></tr></thead><tbody>
+{% for name, s in stats.items() %}<tr><td class="mono">{{ name }}</td><td class="num">{{ s.calls }}</td><td class="num">{{ s.errors }}</td><td class="num">{{ s.p50_ms }}</td><td class="num">{{ s.p95_ms }}</td></tr>{% endfor %}
+</tbody></table>{% else %}<div class="empty">No tool calls in this process yet. Budget: p95 ≤ 300 ms.</div>{% endif %}
+
+<h3>Kill switch</h3>
+{% if static_mode %}<div class="empty"><b>Actions run on the server version.</b>This page is a static snapshot of the simulated showcase day. The kill switch, live calls and tool latency need the API (Dockerfile in the repo).</div>{% else %}
+<form class="head" id="kill-form" data-paused="{{ 'true' if paused else 'false' }}">
+  <label for="kill-code" style="margin:0">Access code</label><input id="kill-code" type="password" autocomplete="off" required>
+  <button class="btn danger" type="submit">{{ 'Resume calling' if paused else 'Pause all calling' }}</button>
+  <span id="kill-msg" class="muted" role="status"></span>
+</form>{% endif %}
+{% endblock %}

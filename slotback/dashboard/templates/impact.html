@@ -1,0 +1,60 @@
+{% extends "base.html" %}{% from "macros.html" import tag, val %}
+{% block title %}{{ t.impact_title }}{% endblock %}
+{% block appclass %}with-ctx{% endblock %}
+{% block main %}
+<div class="head">
+  <h1>{{ t.impact_title }}</h1><span class="badge-sim">▲ SIMULATED</span>
+  <div class="right desk-only">
+    <button class="btn" id="replay-btn" data-label-play="{{ t.replay }} ▶" data-label-pause="{{ t.pause }} ❚❚">{{ t.replay }} ▶</button>
+  </div>
+</div>
+
+<div class="metrics" aria-live="polite">
+  <div class="metric"><div class="lab">{{ t.recovered }}</div>
+    <div class="num" id="recovered" data-final="{{ val(reg, 'recovered_slots') }}">{{ val(reg, 'recovered_slots') }}</div>{{ tag(reg, 'recovered_slots') }}</div>
+  <div class="metric"><div class="lab">{{ t.sms_only }}</div>
+    <div class="num md">{{ val(reg, 'sms_only_recovered_slots') }}</div>{{ tag(reg, 'sms_only_recovered_slots') }}</div>
+  <div class="metric"><div class="lab">Billable (attended, minus what staff refill anyway)</div>
+    <div class="num md">{{ val(reg, 'billable_recovered_slots') }}</div>{{ tag(reg, 'billable_recovered_slots') }}</div>
+  <div class="metric"><div class="lab">Cost of one missed visit</div>
+    <div class="num md">≈ €{{ val(reg, 'benchmark_cost_per_missed_eur', '{:.0f}') }}</div>{{ tag(reg, 'benchmark_cost_per_missed_eur') }}</div>
+</div>
+
+<h3>Confirmation campaign · 09:00 – 20:00 · freed slots by specialty</h3>
+<div class="tl" id="timeline">
+  <div class="axis"><span></span><div><span>09</span><span>11</span><span>13</span><span>15</span><span>17</span><span>20</span></div></div>
+  {% for spec, marks in lanes.items() %}
+  <div class="r"><span>{{ spec }}</span><div class="lane" style="height:{{ 44 + ((marks|map(attribute='row')|list) + [0])|max * 26 }}px">
+    {% for m in marks %}<span class="mk {{ m.state }}" data-slot="{{ m.slot }}" style="left:{{ m.pos }}%;top:{{ 11 + m.row * 26 }}px" title="{{ m.slot }} freed {{ m.time }}">{% if m.state == 'ok' %}✓ r{{ m.rank }}{% elif m.state == 'un' %}✕{% else %}⟳{% endif %}</span>{% endfor %}
+    {% if not marks %}<span class="muted" style="font-size:12px;position:absolute;top:12px;left:4px">No slots freed</span>{% endif %}
+  </div></div>
+  {% endfor %}
+</div>
+<div class="legend"><span class="st ok">✓ r2 refilled by rank 2</span><span class="st off">⟳ offering</span><span class="st un">✕ unfilled</span><span>Ranks are the hospital's waiting-list order.</span></div>
+
+<h3>What drives this simulation</h3>
+<p class="muted" style="font-size:14px;max-width:820px">Behaviour is assumed, not measured: {% for k, v in reg.assumptions.value.items() %}<span class="tag assume">{{ k }} = {{ v }}</span> {% endfor %}. Change them and the numbers change; the pilot (docs/09) is how the real values would be measured, against an SMS-only control group.</p>
+<div class="phone-only alert">The full replay is on a wider screen. <a href="/verify">Verify the ledger</a>.</div>
+{% endblock %}
+
+{% block ctx %}
+<aside class="ctx" aria-label="{{ t.ledger }}">
+  <div style="display:flex;justify-content:space-between;font:600 14px var(--sans);margin-bottom:6px">
+    <span>{{ t.ledger }}</span>
+    <span id="chain-status" class="{{ 'chain-ok' if report.ok else 'chain-bad' }}">{{ '✓ ' ~ t.verified if report.ok else '✕ ' ~ t.broken }}</span>
+  </div>
+  <div class="muted" style="font-size:12px;margin-bottom:10px">{{ report.events }} events · {{ report.checks.list_order.detail }}</div>
+  <ol class="ledger" id="ledger-list">
+    {% for e in last_events %}
+    <li class="{{ 'care-ev' if e.care }}{{ ' fill' if e.type == 'slot_filled' }}" data-seq="{{ e.seq }}"><span class="n">#{{ e.seq }}</span><span class="t">{{ '◆ ' if e.care }}{{ e.type }}{% if e.rank %} · r{{ e.rank }}{% endif %}{% if e.outcome %} · {{ e.outcome|replace('_',' ') }}{% endif %}</span></li>
+    {% endfor %}
+  </ol>
+  <div style="margin-top:16px;display:grid;gap:8px">
+    <button class="btn danger" id="tamper-btn" data-seq="{{ last_events[-1].seq if last_events else 1 }}">{{ t.tamper }}</button>
+    <button class="btn" id="restore-btn" hidden>{{ t.restore }}</button>
+    <a class="btn ghost" href="/evidence/showcase-2026-10-16.zip" download>Download the signed bundle ↓</a>
+  </div>
+  <div id="tamper-result" class="alert" hidden role="status"></div>
+</aside>
+<script id="replay-data" type="application/json">{{ replay|tojson }}</script>
+{% endblock %}

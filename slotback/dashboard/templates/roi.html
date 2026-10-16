@@ -1,0 +1,42 @@
+{% extends "base.html" %}{% from "macros.html" import tag, val %}
+{% block title %}{{ t.roi_title }}{% endblock %}
+{% block main %}
+<div class="head"><h1>{{ t.roi_title }}</h1><span class="tag assume">Model, not a forecast</span></div>
+<p class="lede muted" style="font-size:16px">Every input says where it comes from. Defaults are the synthetic hospital profile and published benchmarks; behaviour inputs are assumptions a pilot would measure (docs/09).</p>
+
+<div class="grid2" style="margin-top:24px">
+<section id="roi-inputs">
+  {% set inputs = [
+    ("appointments", "Specialist appointments per year", 380000, 50000, 1000000, 10000, "", "synth"),
+    ("noshow", "No-show rate", 12, 4, 20, 0.5, "%", "synth"),
+    ("cost", "Cost of one missed visit (€)", 61, 30, 120, 1, "", "bench"),
+    ("contact", "Patients reached by the call", 68, 30, 90, 1, "%", "assume"),
+    ("cancel", "Would-be no-shows who cancel when reached", 45, 10, 80, 1, "%", "assume"),
+    ("fill", "Freed slots refilled from the list", 80, 20, 100, 1, "%", "assume"),
+    ("baseline", "Slots staff would refill anyway", 35, 0, 80, 1, "%", "assume"),
+    ("price", "Price per billable recovered slot (€)", 15, 2, 60, 1, "", "assume"),
+    ("platform", "Platform fee per year (€)", 12000, 0, 100000, 1000, "", "assume"),
+  ] %}
+  {% for id, label, v, lo, hi, step, unit, prov in inputs %}
+  <div class="slider">
+    <div class="row"><label for="in-{{ id }}">{{ label }}</label><output id="out-{{ id }}">{{ v }}{{ unit }}</output></div>
+    <input type="range" id="in-{{ id }}" min="{{ lo }}" max="{{ hi }}" step="{{ step }}" value="{{ v }}" data-unit="{{ unit }}">
+    {% if prov == "bench" %}{{ tag(reg, 'benchmark_cost_per_missed_eur') }}{% elif prov == "synth" %}<span class="tag synth">Synthetic profile</span>{% else %}<span class="tag assume">Assumption</span>{% endif %}
+  </div>
+  {% endfor %}
+</section>
+<section aria-live="polite">
+  <div class="metric"><div class="lab">Billable recovered slots per year</div><div class="num" id="r-slots">—</div><span class="tag assume">Model output</span></div>
+  <table style="margin-top:24px"><tbody>
+    <tr><td>Missed appointments per year</td><td class="num" id="r-missed">—</td></tr>
+    <tr><td>Slots freed early by the call</td><td class="num" id="r-freed">—</td></tr>
+    <tr><td>Refilled from the waiting list</td><td class="num" id="r-filled">—</td></tr>
+    <tr><td>Value of billable slots (at cost of a missed visit)</td><td class="num" id="r-value">—</td></tr>
+    <tr><td>Hospital pays (outcome fee + platform fee)</td><td class="num" id="r-pay">—</td></tr>
+    <tr><td><b>Net value to the hospital</b></td><td class="num" id="r-net">—</td></tr>
+    <tr><td>Break-even price per slot</td><td class="num" id="r-breakeven">—</td></tr>
+  </tbody></table>
+  <p class="muted" style="font-size:13px;margin-top:12px">Billable = refilled AND attended AND matched to the hospital's own booking, minus the slots staff would have refilled anyway (docs/04). Formulas are in the page source.</p>
+</section>
+</div>
+{% endblock %}

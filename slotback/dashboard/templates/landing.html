@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% from "macros.html" import tag, val %}
+{% block title %}Freed slots, returned in order{% endblock %}
+{% block body %}
+<main class="landing" id="main">
+  <div class="ctxbar"><span>{{ t.context }}</span><a {% if static_mode %}hidden {% endif %}href="?lang={{ 'es' if lang == 'en' else 'en' }}" style="margin-left:auto">{{ 'Español' if lang == 'en' else 'English' }}</a></div>
+  <div class="hero-num" aria-label="{{ val(reg, 'recovered_slots') }} {{ t.recovered }}">{{ val(reg, 'recovered_slots') }}</div>
+  <div class="muted">{{ t.recovered }} · one synthetic clinic day {{ tag(reg, 'recovered_slots') }}
+    <span class="vs">&nbsp;vs {{ val(reg, 'sms_only_recovered_slots') }}</span> {{ t.sms_only }} {{ tag(reg, 'sms_only_recovered_slots') }}</div>
+  <h1>{{ t.landing_title }}</h1>
+  <p class="lede muted">{{ t.landing_sub }}</p>
+  <div class="row">
+    <a class="btn primary" href="/impact">{{ t.see_day }}</a>
+    <a class="btn" href="/verify">Verify the ledger yourself</a>
+    <a class="btn ghost" href="https://github.com/digvijaysingh-ai/slotback">{{ t.case_study }}</a>
+  </div>
+  <div class="guards" aria-label="Safeguards">
+    <span class="care">◆ AI disclosed</span><span class="care">◆ Identity verified</span>
+    <span class="care">◆ Read back</span><span class="care">◆ Handed to a human</span>
+    <span class="muted" style="font-size:14px">Never gives clinical advice. Never changes the hospital's order.</span>
+  </div>
+  <p class="muted" style="margin-top:40px;font-size:13px;max-width:760px">Specialist no-show rates in other Spanish regions run from 5.75% <span class="tag bench">Benchmark [S5, 2024]</span> to 14.6% <span class="tag bench">Benchmark [S6, 2011]</span>; a missed visit cost ≈ €61 in the best-documented case {{ tag(reg, 'benchmark_cost_per_missed_eur') }}. Everything about Hospital General is fictional and every Slotback result shown here is simulated on synthetic data.</p>
+</main>
+{% endblock %}

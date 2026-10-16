@@ -1,0 +1,20 @@
+# Timer sweep (EOV1): expire lapsed holds and apply cut-offs on the live API every 5 minutes.
+# Inactive until the API is deployed: set the SWEEP_URL and TOOL_SECRET repository secrets.
+name: sweep
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/5 7-19 * * 1-6"
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    steps:
+      - name: POST /hooks/sweep
+        env:
+          SWEEP_URL: ${{ secrets.SWEEP_URL }}
+          TOOL_SECRET: ${{ secrets.TOOL_SECRET }}
+        run: |
+          if [ -z "$SWEEP_URL" ]; then echo "SWEEP_URL not set; API not deployed yet"; exit 0; fi
+          curl -fsS -X POST "$SWEEP_URL/hooks/sweep" -H "X-Tool-Secret: $TOOL_SECRET"

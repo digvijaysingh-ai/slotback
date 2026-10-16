@@ -1,0 +1,37 @@
+{% extends "base.html" %}{% from "macros.html" import status %}
+{% block title %}Call {{ call_id }}{% endblock %}
+{% block main %}
+<p><a href="/console{{ '?h=' ~ call.hospital if call }}">← Console</a></p>
+{% if not call %}
+<div class="empty"><b>Call not found.</b>It may belong to a hospital that was reset. <a href="/console">Back to the console</a>.</div>
+{% else %}
+<div class="head">
+  <h1 class="mono" style="font-family:var(--mono);font-size:24px">{{ call.pid }} · {{ call.purpose }}{% if call.rank %} · rank {{ call.rank }}{% endif %}</h1>
+  {{ status(call.outcome) }}
+  {% if call.simulated %}<span class="badge-sim">▲ SIMULATED</span>{% endif %}
+</div>
+{% for kind, msg in flags %}<div class="alert {{ 'err' if kind == 'privacy' else 'warn' }}"><b>{{ kind|capitalize }}:</b> {{ msg }}</div>{% endfor %}
+
+<div class="grid2">
+  <section>
+    <h3>Transcript</h3>
+    {% if call.transcript %}
+      <ol class="ledger">{% for turn in call.transcript %}<li><span class="n">{{ turn.role }}</span><span>{{ turn.message }}</span></li>{% endfor %}</ol>
+    {% elif call.simulated %}
+      <div class="empty"><b>Simulated call: no audio or transcript.</b>The showcase day is produced by the simulator through the real tools. The tool timeline on the right is the record.</div>
+    {% else %}
+      <div class="empty"><b>Transcript still processing.</b>It arrives with the post-call webhook.</div>
+    {% endif %}
+  </section>
+  <section>
+    <h3>Tool and ledger timeline</h3>
+    {% if events %}
+    <ol class="ledger">{% for e in events %}
+      <li class="{{ 'care-ev' if e.care }}"><span class="n">#{{ e.seq }}</span><span class="t">{{ e.ts }} · {{ '◆ ' if e.care }}{{ e.type }}{% for k, v in e.payload.items() if k not in ('pid',) %} · {{ k }}={{ v }}{% endfor %}</span></li>
+    {% endfor %}</ol>
+    {% else %}<div class="empty">No ledger events for this call (e.g. it was not answered).</div>{% endif %}
+    {% if call.conversation_id %}<p class="muted" style="font-size:13px">Trace id: <span class="mono">{{ call.conversation_id }}</span></p>{% endif %}
+  </section>
+</div>
+{% endif %}
+{% endblock %}

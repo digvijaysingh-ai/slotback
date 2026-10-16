@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ t.try_title }}{% endblock %}
+{% block main %}
+<div class="head"><h1>{{ t.try_title }}</h1><span class="tag meas">Live demo</span></div>
+<p class="lede muted" style="font-size:16px">Play a synthetic patient calling the hospital. Use a patient from the live demo list; the agent will ask for their date of birth and the last three digits and letter of their ID. Calls are recorded for the demo. Never use real personal data.</p>
+{% if static_mode %}<div class="empty" style="margin-top:20px"><b>The live agent runs on the server version.</b>Watch the recorded demo in the case study, or run the server locally: <span class="mono">uv run python -m slotback.serve</span>.</div>
+{% elif not agent_id %}
+<div class="empty" style="margin-top:20px"><b>The demo agent isn't connected on this server.</b>Set ELEVENLABS_INBOUND_AGENT_ID to enable the widget.</div>
+{% else %}
+<form id="session-form" class="head" style="margin-top:20px">
+  <label for="code" style="margin:0">Access code</label><input id="code" type="password" autocomplete="off" required>
+  <button class="btn primary" type="submit">Start a session</button>
+  <span id="session-msg" class="muted" role="status"></span>
+</form>
+<div id="widget-slot" data-agent-id="{{ agent_id }}"></div>
+<p class="muted" style="font-size:13px">3-minute cap per session · monthly minutes capped · when the cap is reached, watch the recorded demo instead.</p>
+{% endif %}
+{% endblock %}

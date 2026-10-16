@@ -1,0 +1,225 @@
+{
+  "_about": "Every number shown on the dashboard, docs and readout comes from here. SIMULATED = output of slotback.sim on synthetic data with the assumptions listed; BENCHMARK = published figure from another region with source and year; SYNTHETIC = property of the generated data. Nothing here is a measured result.",
+  "appointments": {
+    "value": 400,
+    "provenance": "SYNTHETIC",
+    "note": "Synthetic clinic day, 5 specialties"
+  },
+  "hospital_no_show_rate": {
+    "value": 0.12,
+    "provenance": "SYNTHETIC",
+    "note": "Synthetic profile of Hospital General (fictional)"
+  },
+  "confirm_calls": {
+    "value": 400,
+    "provenance": "SIMULATED",
+    "note": "Confirmation calls placed"
+  },
+  "contact_rate": {
+    "value": 0.685,
+    "provenance": "SIMULATED",
+    "note": "Share of calls answered"
+  },
+  "confirmed": {
+    "value": 260,
+    "provenance": "SIMULATED",
+    "note": "Appointments confirmed"
+  },
+  "freed_slots": {
+    "value": 14,
+    "provenance": "SIMULATED",
+    "note": "Slots freed by a cancellation during the call"
+  },
+  "backfill_calls": {
+    "value": 41,
+    "provenance": "SIMULATED",
+    "note": "Calls to the waiting list"
+  },
+  "recovered_slots": {
+    "value": 14,
+    "provenance": "SIMULATED",
+    "note": "Freed slots refilled by the agent, in list order"
+  },
+  "unfilled_slots": {
+    "value": 0,
+    "provenance": "SIMULATED",
+    "note": "Freed slots not refilled"
+  },
+  "fill_rate": {
+    "value": 1.0,
+    "provenance": "SIMULATED",
+    "note": "Refilled ÷ freed"
+  },
+  "median_time_to_fill_min": {
+    "value": 11.0,
+    "provenance": "SIMULATED",
+    "note": "From release to booking"
+  },
+  "attended_backfilled": {
+    "value": 14,
+    "provenance": "SIMULATED",
+    "note": "Backfilled patients who attended"
+  },
+  "billable_recovered_slots": {
+    "value": 9,
+    "provenance": "SIMULATED",
+    "note": "Attended backfills minus the slots staff would have refilled anyway (staff_refill_rate = 0.35)"
+  },
+  "sms_only_recovered_slots": {
+    "value": 3.7,
+    "provenance": "SIMULATED",
+    "note": "Counterfactual: would-be no-shows × sms_cancel_share (0.25) × staff_refill_rate (0.35)"
+  },
+  "privacy_leaks": {
+    "value": 0,
+    "provenance": "SIMULATED",
+    "note": "Ledger verifier: identity before detail"
+  },
+  "ledger_events": {
+    "value": 1707,
+    "provenance": "SIMULATED",
+    "note": "Events in the signed showcase ledger"
+  },
+  "cost_per_recovered_slot_eur": {
+    "value": 3.54,
+    "provenance": "SIMULATED",
+    "note": "Estimated platform cost ÷ recovered slots (see assumptions)"
+  },
+  "assumptions": {
+    "provenance": "ASSUMPTION",
+    "value": {
+      "p_answer": 0.65,
+      "p_voicemail": 0.2,
+      "p_cancel_if_would_miss": 0.45,
+      "p_backfill_answer": 0.6,
+      "p_backfill_voicemail": 0.25,
+      "p_backfill_accept": 0.55,
+      "p_attend_backfilled": 0.9,
+      "sms_cancel_share": 0.25,
+      "staff_refill_rate": 0.35
+    }
+  },
+  "benchmark_cost_per_missed_eur": {
+    "value": 61.3,
+    "provenance": "BENCHMARK",
+    "source": "S2",
+    "year": "2013-14",
+    "note": "€3,386,919 ÷ 55,249 missed appointments, our calculation"
+  },
+  "benchmark_no_show_rate_reference": {
+    "value": 0.138,
+    "provenance": "BENCHMARK",
+    "source": "S2",
+    "year": "2013-14",
+    "note": "Reference health area, 400,761 appointments"
+  },
+  "benchmark_forgot_or_communication_share": {
+    "value": 0.46,
+    "provenance": "BENCHMARK",
+    "source": "S2",
+    "year": "2013-14",
+    "note": "Forgot 29.6% + communication failure 16.0% (Table 26)"
+  },
+  "confirmation_rate": {
+    "value": 0.949,
+    "provenance": "SIMULATED",
+    "note": "Confirmed ÷ patients reached"
+  },
+  "early_cancellation_rate": {
+    "value": 0.035,
+    "provenance": "SIMULATED",
+    "note": "Cancellations during the confirmation call ÷ calls"
+  },
+  "voice_arm_refill_rate": {
+    "value": 1.0,
+    "provenance": "SIMULATED",
+    "note": "Freed slots refilled by the agent"
+  },
+  "sms_arm_refill_rate": {
+    "value": 0.35,
+    "provenance": "ASSUMPTION",
+    "note": "Staff refill rate assumed for the SMS-only arm"
+  },
+  "agent_minutes_per_recovered_slot": {
+    "value": 47.2,
+    "provenance": "SIMULATED",
+    "note": "ASSUMPTION ~1.5 billed minutes per call × calls ÷ recovered slots"
+  },
+  "staff_hours_saved": {
+    "value": 22.1,
+    "provenance": "SIMULATED",
+    "note": "ASSUMPTION ~3 staff minutes per call avoided × calls"
+  },
+  "elevenlabs_rate_per_min_usd": {
+    "value": 0.08,
+    "provenance": "BENCHMARK",
+    "source": "ElevenLabs pricing page",
+    "year": "2026",
+    "note": "Extra agent minute, checked 2026-10-16"
+  },
+  "judge_agreement": {
+    "value": null,
+    "provenance": "SIMULATED",
+    "note": "Needs ~20 hand-labelled transcripts from the live agent"
+  },
+  "text_sim_turn_latency_p50_ms": {
+    "value": null,
+    "provenance": "SIMULATED",
+    "note": "Needs ElevenLabs Tests (agent not pushed yet)"
+  },
+  "text_sim_turn_latency_p95_ms": {
+    "value": null,
+    "provenance": "SIMULATED",
+    "note": "Needs ElevenLabs Tests (agent not pushed yet)"
+  },
+  "eval_task_completion": {
+    "value": 1.0,
+    "provenance": "SIMULATED",
+    "note": "ElevenLabs Tests success condition, 3 simulated conversations (advisory judge)"
+  },
+  "eval_tool_call_accuracy": {
+    "value": null,
+    "provenance": "SIMULATED",
+    "note": "Conversation evals need the pushed agent"
+  },
+  "eval_readback_rate": {
+    "value": null,
+    "provenance": "SIMULATED",
+    "note": "Conversation evals need the pushed agent"
+  },
+  "eval_escalation_accuracy": {
+    "value": null,
+    "provenance": "SIMULATED",
+    "note": "Conversation evals need the pushed agent"
+  },
+  "eval_disclosure_rate": {
+    "value": 1.0,
+    "provenance": "SIMULATED",
+    "note": "AI disclosed in the first agent turn, 3 runs"
+  },
+  "eval_scenarios_total": {
+    "value": 15,
+    "provenance": "SIMULATED",
+    "note": "Scenarios in the full set"
+  },
+  "eval_errored": {
+    "value": 0,
+    "provenance": "SIMULATED",
+    "note": "Scenarios that could not run"
+  },
+  "leak_detector_recall": {
+    "value": 1.0,
+    "provenance": "SIMULATED",
+    "note": "16/16 planted leaks caught"
+  },
+  "leak_detector_false_alarms": {
+    "value": 0,
+    "provenance": "SIMULATED",
+    "note": "False alarms on 10 clean transcripts"
+  },
+  "tool_latency_p95_ms": {
+    "value": 0.9,
+    "provenance": "MEASURED",
+    "note": "120 tool calls through the API on a laptop with embedded Postgres (p50 0.6 ms); not the hosted demo"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "_comment": "Agent profiles (D16, 2A). demo: recording on, used only for the developer's own phone and the browser widget. production-reference: zero retention, no recording, documented only. Safety fragments are composed into every profile.",
+  "outbound-demo": {
+    "name": "Slotback · outbound · demo",
+    "direction": "outbound",
+    "fragments": [
+      "00_role",
+      "10_disclosure",
+      "15_upset",
+      "20_identity",
+      "30_privacy",
+      "40_clinical",
+      "50_actions",
+      "60_backfill",
+      "70_human_and_optout",
+      "80_language_and_close"
+    ],
+    "record_voice": true,
+    "zero_retention_mode": false
+  },
+  "inbound-demo": {
+    "name": "Slotback · inbound · demo",
+    "direction": "inbound",
+    "fragments": [
+      "00_role",
+      "10_disclosure",
+      "15_upset",
+      "20_identity",
+      "30_privacy",
+      "40_clinical",
+      "50_actions",
+      "70_human_and_optout",
+      "80_language_and_close"
+    ],
+    "record_voice": true,
+    "zero_retention_mode": false
+  },
+  "outbound-production-reference": {
+    "name": "Slotback · outbound · production reference",
+    "direction": "outbound",
+    "fragments": [
+      "00_role",
+      "10_disclosure",
+      "15_upset",
+      "20_identity",
+      "30_privacy",
+      "40_clinical",
+      "50_actions",
+      "60_backfill",
+      "70_human_and_optout",
+      "80_language_and_close"
+    ],
+    "record_voice": false,
+    "zero_retention_mode": true
+  },
+  "inbound-production-reference": {
+    "name": "Slotback · inbound · production reference",
+    "direction": "inbound",
+    "fragments": [
+      "00_role",
+      "10_disclosure",
+      "15_upset",
+      "20_identity",
+      "30_privacy",
+      "40_clinical",
+      "50_actions",
+      "70_human_and_optout",
+      "80_language_and_close"
+    ],
+    "record_voice": false,
+    "zero_retention_mode": true
+  }
+}

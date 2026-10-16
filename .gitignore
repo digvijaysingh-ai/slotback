@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.pyc
+*.db
+*.sqlite
+.DS_Store
+out/
+evidence/*.tmp
+.data/
+dist/
+evals/results/elevenlabs_raw.json
+evals/results/partial.json
+recordings/

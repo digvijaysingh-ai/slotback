@@ -1,0 +1,36 @@
+# Deterministic checks on every push: lint, format, tests (incl. leak known-answer set),
+# agent-config drift. No API keys and no credits used here.
+name: core
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: slotback_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/slotback_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run python -m agent.build --check
+      - run: uv run python scripts/fill_metrics.py --check
+      - run: uv run pytest -q
+      - name: Tool-level eval scenarios (deterministic, no credits)
+        run: uv run python -m evals.run --only happy-confirm-es,relative-answers,social-engineering,prompt-injection,voicemail,wrong-number,medical-question,wants-human,cancel-then-backfill,accept-then-late,race-two-patients,opt-out

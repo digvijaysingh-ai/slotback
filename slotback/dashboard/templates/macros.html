@@ -1,0 +1,23 @@
+{# Provenance tag for any registry key (D28): SIMULATED / BENCHMARK [S, year] / SYNTHETIC / MEASURED #}
+{% macro tag(reg, key) -%}
+{%- set e = reg.get(key) -%}
+{%- if e -%}
+  {%- set p = e.provenance -%}
+  {%- if p == "SIMULATED" -%}<span class="tag sim" title="{{ e.note }}">Simulated</span>
+  {%- elif p == "BENCHMARK" -%}<span class="tag bench" title="{{ e.note }}">Benchmark [{{ e.source }}, {{ e.year }}]</span>
+  {%- elif p == "SYNTHETIC" -%}<span class="tag synth" title="{{ e.note }}">Synthetic</span>
+  {%- elif p == "MEASURED" -%}<span class="tag meas" title="{{ e.note }}">Measured</span>
+  {%- else -%}<span class="tag assume">Assumption</span>{%- endif -%}
+{%- endif -%}
+{%- endmacro %}
+
+{% macro val(reg, key, fmt="{}") -%}
+{%- set e = reg.get(key) -%}{%- if e and e.value is not none -%}{{ fmt.format(e.value) }}{%- else -%}—{%- endif -%}
+{%- endmacro %}
+
+{% macro status(outcome) -%}
+{%- if outcome in ("confirmed", "completed", "backfill_booked", "rescheduled", "filled") -%}<span class="st ok">✓ {{ outcome|replace("_", " ") }}</span>
+{%- elif outcome in ("cancelled", "voicemail", "no_answer", "offering", "in_progress", "hold_expired", "freed") -%}<span class="st off">⟳ {{ outcome|replace("_", " ") }}</span>
+{%- elif outcome in ("unfilled", "failed", "transferred", "wrong_number", "busy") -%}<span class="st un">✕ {{ outcome|replace("_", " ") }}</span>
+{%- else -%}<span class="st neutral">{{ outcome|replace("_", " ") }}</span>{%- endif -%}
+{%- endmacro %}

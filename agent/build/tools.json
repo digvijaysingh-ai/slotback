@@ -1,0 +1,372 @@
+[
+  {
+    "api_schema": {
+      "method": "POST",
+      "request_body_schema": {
+        "description": "Call right after you have said you are an AI assistant and that the call is recorded.",
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "request_headers": {
+        "X-Call-Token": {
+          "variable_name": "secret__call_token"
+        },
+        "X-Tool-Secret": {
+          "secret_id": "{{TOOL_SECRET_ID}}"
+        }
+      },
+      "url": "{{TOOL_BASE_URL}}/tools/record_disclosure"
+    },
+    "description": "Call right after you have said you are an AI assistant and that the call is recorded.",
+    "name": "record_disclosure",
+    "response_timeout_secs": 10,
+    "type": "webhook"
+  },
+  {
+    "api_schema": {
+      "method": "POST",
+      "request_body_schema": {
+        "description": "Check the patient's identity. Say nothing about any appointment until this returns status 'verified'.",
+        "properties": {
+          "date_of_birth": {
+            "description": "Patient's date of birth as YYYY-MM-DD.",
+            "type": "string"
+          },
+          "id_last3": {
+            "description": "Last three digits of the patient's ID number.",
+            "type": "string"
+          },
+          "id_letter": {
+            "description": "The letter at the end of the patient's ID number.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "date_of_birth",
+          "id_last3",
+          "id_letter"
+        ],
+        "type": "object"
+      },
+      "request_headers": {
+        "X-Call-Token": {
+          "variable_name": "secret__call_token"
+        },
+        "X-Tool-Secret": {
+          "secret_id": "{{TOOL_SECRET_ID}}"
+        }
+      },
+      "url": "{{TOOL_BASE_URL}}/tools/verify_identity"
+    },
+    "description": "Check the patient's identity. Say nothing about any appointment until this returns status 'verified'.",
+    "name": "verify_identity",
+    "response_timeout_secs": 10,
+    "type": "webhook"
+  },
+  {
+    "api_schema": {
+      "method": "POST",
+      "request_body_schema": {
+        "description": "Get the verified patient's next appointment.",
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "request_headers": {
+        "X-Call-Token": {
+          "variable_name": "secret__call_token"
+        },
+        "X-Tool-Secret": {
+          "secret_id": "{{TOOL_SECRET_ID}}"
+        }
+      },
+      "url": "{{TOOL_BASE_URL}}/tools/get_appointment"
+    },
+    "description": "Get the verified patient's next appointment.",
+    "name": "get_appointment",
+    "response_timeout_secs": 10,
+    "type": "webhook"
+  },
+  {
+    "api_schema": {
+      "method": "POST",
+      "request_body_schema": {
+        "description": "Confirm the appointment after reading it back.",
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "request_headers": {
+        "X-Call-Token": {
+          "variable_name": "secret__call_token"
+        },
+        "X-Tool-Secret": {
+          "secret_id": "{{TOOL_SECRET_ID}}"
+        }
+      },
+      "url": "{{TOOL_BASE_URL}}/tools/confirm_appointment"
+    },
+    "description": "Confirm the appointment after reading it back.",
+    "name": "confirm_appointment",
+    "response_timeout_secs": 10,
+    "type": "webhook"
+  },
+  {
+    "api_schema": {
+      "method": "POST",
+      "request_body_schema": {
+        "description": "Cancel the appointment. Requires an explicit yes after the read-back.",
+        "properties": {
+          "patient_confirmed": {
+            "description": "True only after you read the appointment back and the patient said an explicit yes to cancelling it.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "patient_confirmed"
+        ],
+        "type": "object"
+      },
+      "request_headers": {
+        "X-Call-Token": {
+          "variable_name": "secret__call_token"
+        },
+        "X-Tool-Secret": {
+          "secret_id": "{{TOOL_SECRET_ID}}"
+        }
+      },
+      "url": "{{TOOL_BASE_URL}}/tools/cancel_appointment"
+    },
+    "description": "Cancel the appointment. Requires an explicit yes after the read-back.",
+    "name": "cancel_appointment",
+    "response_timeout_secs": 10,
+    "type": "webhook"
+  },
+  {
+    "api_schema": {
+      "method": "POST",
+      "request_body_schema": {
+        "description": "List real open slots for rescheduling.",
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "request_headers": {
+        "X-Call-Token": {
+          "variable_name": "secret__call_token"
+        },
+        "X-Tool-Secret": {
+          "secret_id": "{{TOOL_SECRET_ID}}"
+        }
+      },
+      "url": "{{TOOL_BASE_URL}}/tools/list_alternative_slots"
+    },
+    "description": "List real open slots for rescheduling.",
+    "name": "list_alternative_slots",
+    "response_timeout_secs": 10,
+    "type": "webhook"
+  },
+  {
+    "api_schema": {
+      "method": "POST",
+      "request_body_schema": {
+        "description": "Move the appointment to a slot from list_alternative_slots.",
+        "properties": {
+          "slot_id": {
+            "description": "A slot_id returned by list_alternative_slots. Never invent one.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slot_id"
+        ],
+        "type": "object"
+      },
+      "request_headers": {
+        "X-Call-Token": {
+          "variable_name": "secret__call_token"
+        },
+        "X-Tool-Secret": {
+          "secret_id": "{{TOOL_SECRET_ID}}"
+        }
+      },
+      "url": "{{TOOL_BASE_URL}}/tools/reschedule"
+    },
+    "description": "Move the appointment to a slot from list_alternative_slots.",
+    "name": "reschedule",
+    "response_timeout_secs": 10,
+    "type": "webhook"
+  },
+  {
+    "api_schema": {
+      "method": "POST",
+      "request_body_schema": {
+        "description": "Backfill calls only: get the freed slot to offer and start the 10-minute hold.",
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "request_headers": {
+        "X-Call-Token": {
+          "variable_name": "secret__call_token"
+        },
+        "X-Tool-Secret": {
+          "secret_id": "{{TOOL_SECRET_ID}}"
+        }
+      },
+      "url": "{{TOOL_BASE_URL}}/tools/offer_backfill"
+    },
+    "description": "Backfill calls only: get the freed slot to offer and start the 10-minute hold.",
+    "name": "offer_backfill",
+    "response_timeout_secs": 10,
+    "type": "webhook"
+  },
+  {
+    "api_schema": {
+      "method": "POST",
+      "request_body_schema": {
+        "description": "Backfill calls only: book the offered slot after the patient says yes.",
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "request_headers": {
+        "X-Call-Token": {
+          "variable_name": "secret__call_token"
+        },
+        "X-Tool-Secret": {
+          "secret_id": "{{TOOL_SECRET_ID}}"
+        }
+      },
+      "url": "{{TOOL_BASE_URL}}/tools/accept_backfill"
+    },
+    "description": "Backfill calls only: book the offered slot after the patient says yes.",
+    "name": "accept_backfill",
+    "response_timeout_secs": 10,
+    "type": "webhook"
+  },
+  {
+    "api_schema": {
+      "method": "POST",
+      "request_body_schema": {
+        "description": "Backfill calls only: the patient does not want the slot.",
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "request_headers": {
+        "X-Call-Token": {
+          "variable_name": "secret__call_token"
+        },
+        "X-Tool-Secret": {
+          "secret_id": "{{TOOL_SECRET_ID}}"
+        }
+      },
+      "url": "{{TOOL_BASE_URL}}/tools/decline_backfill"
+    },
+    "description": "Backfill calls only: the patient does not want the slot.",
+    "name": "decline_backfill",
+    "response_timeout_secs": 10,
+    "type": "webhook"
+  },
+  {
+    "api_schema": {
+      "method": "POST",
+      "request_body_schema": {
+        "description": "Hand the call to admissions staff.",
+        "properties": {
+          "reason": {
+            "description": "Short reason, e.g. 'medical question', 'asked for a person'.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "type": "object"
+      },
+      "request_headers": {
+        "X-Call-Token": {
+          "variable_name": "secret__call_token"
+        },
+        "X-Tool-Secret": {
+          "secret_id": "{{TOOL_SECRET_ID}}"
+        }
+      },
+      "url": "{{TOOL_BASE_URL}}/tools/transfer_to_human"
+    },
+    "description": "Hand the call to admissions staff.",
+    "name": "transfer_to_human",
+    "response_timeout_secs": 10,
+    "type": "webhook"
+  },
+  {
+    "api_schema": {
+      "method": "POST",
+      "request_body_schema": {
+        "description": "The verified patient does not want automated calls any more.",
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "request_headers": {
+        "X-Call-Token": {
+          "variable_name": "secret__call_token"
+        },
+        "X-Tool-Secret": {
+          "secret_id": "{{TOOL_SECRET_ID}}"
+        }
+      },
+      "url": "{{TOOL_BASE_URL}}/tools/opt_out"
+    },
+    "description": "The verified patient does not want automated calls any more.",
+    "name": "opt_out",
+    "response_timeout_secs": 10,
+    "type": "webhook"
+  },
+  {
+    "api_schema": {
+      "method": "POST",
+      "request_body_schema": {
+        "description": "Record how the call ended, just before ending it.",
+        "properties": {
+          "outcome": {
+            "description": "How the call ended. Pick the closest value.",
+            "enum": [
+              "confirmed",
+              "cancelled",
+              "rescheduled",
+              "voicemail",
+              "third_party",
+              "wrong_number",
+              "transferred",
+              "opted_out",
+              "no_decision",
+              "backfill_booked",
+              "backfill_declined"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "outcome"
+        ],
+        "type": "object"
+      },
+      "request_headers": {
+        "X-Call-Token": {
+          "variable_name": "secret__call_token"
+        },
+        "X-Tool-Secret": {
+          "secret_id": "{{TOOL_SECRET_ID}}"
+        }
+      },
+      "url": "{{TOOL_BASE_URL}}/tools/log_outcome"
+    },
+    "description": "Record how the call ended, just before ending it.",
+    "name": "log_outcome",
+    "response_timeout_secs": 10,
+    "type": "webhook"
+  }
+]

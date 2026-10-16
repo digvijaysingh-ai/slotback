@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slotback — Design System Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Tokens — dark (default, "warm control room") */
+:root{
+  --bg:#151412;--surface:#1C1A17;--raised:#24221E;--line:#34312B;
+  --text:#ECE8E1;--muted:#A39D92;
+  --accent:#7AB3EA;--accent-ink:#0E1B28;
+  --ok:#86C98F;--offering:#E8B860;--unfilled:#EF8A80;--care:#9FD3C7;
+  --sim-fg:#F2C14E;--sim-bg:#3A2C0E;--bench:#9DB4CC;--synth:#A39D92;--meas:#86C98F;
+  --sans:"IBM Plex Sans",ui-sans-serif,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;
+  --r-sm:2px;--r-md:4px;
+}
+/* Tokens — light (print / projector) */
+[data-theme=light]{
+  --bg:#FBFAF7;--surface:#FFFFFF;--raised:#F3F1EC;--line:#DEDAD1;
+  --text:#1B1A17;--muted:#5E5A52;
+  --accent:#1F5FA8;--accent-ink:#FFFFFF;
+  --ok:#2E7D3E;--offering:#8A5A00;--unfilled:#B3261E;--care:#1F6F60;
+  --sim-fg:#6B4A00;--sim-bg:#FFE7A8;--bench:#3D5A78;--synth:#5E5A52;--meas:#2E7D3E;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--text);font:16px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1280px;margin:0 auto;padding:40px 32px 80px}
+header.top{display:flex;align-items:baseline;gap:16px;border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:40px}
+header.top h1{font-size:32px;font-weight:600;letter-spacing:-.01em}
+header.top p{color:var(--muted)}
+.toggle{margin-left:auto;font:500 14px var(--sans);background:transparent;color:var(--text);border:1px solid var(--line);border-radius:var(--r-md);padding:8px 14px;cursor:pointer}
+.toggle:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h2{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:56px 0 16px}
+.lede{font-size:20px;max-width:760px}
+.lede em{font-style:normal;color:var(--care)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.spec{border-top:1px solid var(--line);padding-top:16px}
+.spec .role{font:500 12px var(--mono);color:var(--muted);margin-bottom:8px}
+.d72{font:600 72px/1 var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.d32{font-size:32px;font-weight:600;line-height:1.2}
+.d24{font-size:24px;font-weight:600}
+.mono14{font:400 14px var(--mono);font-variant-numeric:tabular-nums}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.sw{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;background:var(--surface)}
+.sw i{display:block;height:56px}
+.sw div{padding:8px 10px;font:12px var(--mono)}
+.sw div b{display:block;font:500 13px var(--sans)}
+/* Tags & markers */
+.tag{display:inline-block;font:500 11px/1.6 var(--mono);letter-spacing:.04em;padding:0 6px;border-radius:var(--r-sm);border:1px solid currentColor;vertical-align:middle}
+.tag.sim{background:var(--sim-bg);color:var(--sim-fg);border-color:transparent;font-weight:600}
+.tag.bench{color:var(--bench)}.tag.synth{color:var(--synth)}.tag.meas{color:var(--meas)}
+.st{display:inline-flex;align-items:center;gap:6px;font:500 14px var(--sans)}
+.st.ok{color:var(--ok)}.st.off{color:var(--offering)}.st.un{color:var(--unfilled)}
+.care{display:inline-flex;align-items:center;gap:6px;font:500 13px var(--sans);color:var(--care);border:1px solid var(--care);border-radius:var(--r-sm);padding:1px 8px}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:8px 0}
+/* Buttons */
+.btn{font:500 15px var(--sans);border-radius:var(--r-md);padding:10px 16px;border:1px solid var(--line);background:transparent;color:var(--text);cursor:pointer;min-height:44px}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.danger{color:var(--unfilled);border-color:var(--unfilled)}
+.btn.ghost{border-color:transparent;color:var(--accent)}
+.alert{border-left:3px solid;padding:10px 14px;background:var(--surface);border-radius:0 var(--r-md) var(--r-md) 0;font-size:15px;margin:8px 0}
+.alert.warn{border-color:var(--offering)}.alert.err{border-color:var(--unfilled)}.alert.ok{border-color:var(--ok)}
+/* Screen mock */
+.screen{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;display:grid;grid-template-columns:180px 1fr 300px;min-height:520px;background:var(--bg)}
+.rail{background:var(--surface);border-right:1px solid var(--line);padding:16px 0;font-size:14px}
+.rail b{display:block;padding:0 16px 4px;font-size:16px}.rail small{display:block;padding:0 16px 16px;color:var(--muted);font-size:12px}
+.rail a{display:block;padding:8px 16px;color:var(--muted);text-decoration:none}
+.rail a[aria-current]{color:var(--text);background:var(--raised);box-shadow:inset 3px 0 0 var(--accent)}
+.work{padding:20px 24px}
+.ctx{font:12px var(--sans);color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:18px}
+.metric{display:flex;gap:40px;align-items:flex-end;margin-bottom:24px}
+.metric .lab{font-size:14px;color:var(--muted)}
+.tl{border-top:1px solid var(--line)}
+.tl .r{display:grid;grid-template-columns:120px 1fr;border-bottom:1px solid var(--line);height:44px;align-items:center;font-size:14px}
+.tl .lane{position:relative;height:100%}
+.tl .lane span{position:absolute;top:11px;font:500 12px var(--mono);padding:2px 6px;border-radius:var(--r-sm);background:var(--raised)}
+.side{background:var(--surface);border-left:1px solid var(--line);padding:16px;font:12px var(--mono)}
+.side .h{font:600 14px var(--sans);display:flex;justify-content:space-between;margin-bottom:10px}
+.side li{list-style:none;padding:7px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:44px 1fr;gap:6px}
+.side li .n{color:var(--muted)}
+.side ol{padding:0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{text-align:left;font-weight:500;color:var(--muted);border-bottom:1px solid var(--line);padding:8px 12px}
+td{border-bottom:1px solid var(--line);padding:10px 12px}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+footer{margin-top:64px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
+@media (max-width:900px){.grid2{grid-template-columns:1fr}.screen{grid-template-columns:1fr}.rail,.side{display:none}.d72{font-size:56px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <h1>Slotback</h1><p>Design system · warm control room</p>
+  <button class="toggle" onclick="var r=document.documentElement;r.dataset.theme=r.dataset.theme==='light'?'':'light';this.textContent=r.dataset.theme==='light'?'Dark (app)':'Light (print & slides)'">Light (print &amp; slides)</button>
+</header>
+
+<p class="lede">Calm, precise software for patient work. Every number shows where it comes from, and every safeguard is visible: <em>◆ AI disclosed · ◆ identity verified · ◆ read back · ◆ handed to a human.</em></p>
+
+<h2>Typography — IBM Plex Sans + IBM Plex Mono</h2>
+<div class="grid2">
+  <div class="spec"><div class="role">HERO METRIC · Plex Mono 600 / 72 · tabular</div><div class="d72">23</div><div style="color:var(--muted);margin-top:6px">slots returned to the waiting list today <span class="tag sim">SIMULATED</span></div></div>
+  <div class="spec"><div class="role">PAGE TITLE · Plex Sans 600 / 32</div><div class="d32">Patients reached today</div>
+    <div class="role" style="margin-top:20px">SECTION · Plex Sans 600 / 24</div><div class="d24">Freed slots and who was offered them</div></div>
+  <div class="spec"><div class="role">BODY · Plex Sans 400 / 16</div><p>Cardiology slot at 11:40 freed by a cancellation. Offered in the hospital's list order: rank 1 did not answer, rank 2 verified their identity and accepted within the 10-minute hold.</p></div>
+  <div class="spec"><div class="role">DATA · Plex Mono 400 / 14 · tabular</div><p class="mono14">#1046 offer_started  r2  hold 10:00  e9f2…12b<br>#1047 offer_accepted       41ac…d55<br>#1048 slot_filled          8e70…b19</p></div>
+</div>
+
+<h2>Colour — restrained, one accent, meaning only</h2>
+<div class="swatches">
+  <div class="sw"><i style="background:var(--bg)"></i><div><b>Background</b>#151412</div></div>
+  <div class="sw"><i style="background:var(--surface)"></i><div><b>Surface</b>#1C1A17</div></div>
+  <div class="sw"><i style="background:var(--raised)"></i><div><b>Raised</b>#24221E</div></div>
+  <div class="sw"><i style="background:var(--text)"></i><div><b>Text</b>#ECE8E1</div></div>
+  <div class="sw"><i style="background:var(--muted)"></i><div><b>Muted</b>#A39D92</div></div>
+  <div class="sw"><i style="background:var(--accent)"></i><div><b>Clinic blue</b>#7AB3EA</div></div>
+  <div class="sw"><i style="background:var(--ok)"></i><div><b>Filled / ok</b>#86C98F</div></div>
+  <div class="sw"><i style="background:var(--offering)"></i><div><b>Offering</b>#E8B860</div></div>
+  <div class="sw"><i style="background:var(--unfilled)"></i><div><b>Unfilled / error</b>#EF8A80</div></div>
+  <div class="sw"><i style="background:var(--care)"></i><div><b>Care marker</b>#9FD3C7</div></div>
+</div>
+
+<h2>Status, provenance and care markers</h2>
+<div class="row"><span class="st ok">✓ Filled</span><span class="st off">⟳ Offering · rank 2</span><span class="st un">✕ Unfilled</span></div>
+<div class="row"><span class="tag sim">SIMULATED</span><span class="tag bench">BENCHMARK [S2, 2013–14]</span><span class="tag synth">SYNTHETIC</span><span class="tag meas">MEASURED</span></div>
+<div class="row"><span class="care">◆ AI disclosed</span><span class="care">◆ Identity verified</span><span class="care">◆ Read back</span><span class="care">◆ Handed to a human</span></div>
+
+<h2>Actions and messages</h2>
+<div class="row"><button class="btn primary">See the live day →</button><button class="btn">Replay the day ▶</button><button class="btn danger">Tamper with one event</button><button class="btn ghost">Download bundle ↓</button></div>
+<div class="alert warn"><b>3 of 12 scenarios didn't run.</b> The release gate is not green until they do. <a style="color:var(--accent)" href="#">See the errors</a></div>
+<div class="alert err"><b>Chain broken at #1046.</b> This event was changed after it was recorded. <a style="color:var(--accent)" href="#">Restore</a></div>
+<div class="alert ok"><b>Chain verified.</b> 3,112 events · signed head 16 Oct · list order kept.</div>
+
+<h2>Screen — Impact</h2>
+<div class="screen">
+  <nav class="rail"><b>Slotback</b><small>Hospital General (fictional)</small>
+    <a aria-current="page" href="#">Impact</a><a href="#">Console</a><a href="#">Calls</a><a href="#">ROI</a><a href="#">Evals</a><a href="#">Verify</a><a href="#">Try</a></nav>
+  <main class="work">
+    <div class="ctx">Fictional hospital · synthetic data · simulated results are labelled</div>
+    <div class="metric">
+      <div><div class="lab">Slots returned to the waiting list</div><div class="d72">23</div><span class="tag sim">SIMULATED</span></div>
+      <div><div class="lab">SMS reminders only</div><div class="d32" style="font-family:var(--mono)">9</div><span class="tag sim">SIMULATED</span></div>
+      <div><div class="lab">Cost of one missed visit</div><div class="d32" style="font-family:var(--mono)">≈ €61</div><span class="tag bench">BENCHMARK [S2, 2013–14]</span></div>
+      <div style="margin-left:auto"><button class="btn">Replay the day ▶</button></div>
+    </div>
+    <div class="tl">
+      <div class="r"><span>Cardiology</span><div class="lane"><span style="left:8%;color:var(--ok)">✓</span><span style="left:34%;color:var(--ok)">✓</span><span style="left:58%;color:var(--offering)">⟳ r2</span><span style="left:84%;color:var(--unfilled)">✕</span></div></div>
+      <div class="r"><span>Dermatology</span><div class="lane"><span style="left:18%;color:var(--ok)">✓</span><span style="left:46%;color:var(--ok)">✓</span><span style="left:70%;color:var(--ok)">✓</span></div></div>
+      <div class="r"><span>Orthopaedics</span><div class="lane"><span style="left:6%;color:var(--ok)">✓</span><span style="left:40%;color:var(--offering)">⟳ r1</span><span style="left:76%;color:var(--ok)">✓</span></div></div>
+    </div>
+  </main>
+  <aside class="side"><div class="h"><span>Ledger</span><span style="color:var(--ok)">✓ Verified</span></div>
+    <ol>
+      <li><span class="n">#1041</span><span>slot_freed · cancellation</span></li>
+      <li><span class="n">#1043</span><span>call_attempt · r1 no answer</span></li>
+      <li><span class="n">#1044</span><span>call_attempt · r2 answered</span></li>
+      <li><span class="n">#1045</span><span style="color:var(--care)">◆ identity_verified · r2</span></li>
+      <li><span class="n">#1046</span><span>offer_started · hold 10:00</span></li>
+      <li><span class="n">#1047</span><span style="color:var(--care)">◆ read_back · accepted</span></li>
+      <li><span class="n">#1048</span><span style="color:var(--ok)">✓ slot_filled</span></li>
+    </ol></aside>
+</div>
+
+<h2>Screen — Console (call board)</h2>
+<table>
+  <thead><tr><th>Patient</th><th>Specialty</th><th>Status</th><th>Safeguards</th><th style="text-align:right">Duration</th></tr></thead>
+  <tbody>
+    <tr><td>P-0412</td><td>Cardiology</td><td><span class="st ok">✓ Confirmed</span></td><td><span class="care">◆ AI</span> <span class="care">◆ ID</span> <span class="care">◆ Read back</span></td><td class="num">1:42</td></tr>
+    <tr><td>P-1187</td><td>—</td><td><span class="st off">⟳ Voicemail · callback number only</span></td><td><span class="care">◆ AI</span></td><td class="num">0:21</td></tr>
+    <tr><td>P-0933</td><td>Dermatology</td><td><span class="st un">✕ Wants a human</span></td><td><span class="care">◆ AI</span> <span class="care">◆ ID</span> <span class="care">◆ Handed to a human</span></td><td class="num">2:05</td></tr>
+  </tbody>
+</table>
+<p style="color:var(--muted);font-size:13px;margin-top:8px">Specialty stays hidden ("—") until identity is verified, in the UI too.</p>
+
+<footer>Slotback · fictional hospital, synthetic data · IBM Plex (OFL) · Light set for printed and projected slides via the toggle above.</footer>
+</div>
+</body>
+</html>

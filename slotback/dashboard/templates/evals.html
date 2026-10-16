@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ t.evals_title }}{% endblock %}
+{% block main %}
+<div class="head"><h1>{{ t.evals_title }}</h1><span class="badge-sim">▲ SIMULATED</span></div>
+{% if not results %}
+<div class="empty"><b>No eval run yet.</b>Run <span class="mono">uv run python -m evals.run --smoke</span> to produce a report. Deterministic checks block release; ElevenLabs' built-in scoring is advisory until calibrated.</div>
+{% else %}
+{% set g = results.gate %}
+<div class="alert {{ 'ok' if g.status == 'PASS' else ('warn' if g.status == 'ERRORED' else 'err') }}">
+  <b>Gate {{ g.status }}.</b> {{ g.summary }}</div>
+<div class="metrics">
+  {% for k, label in [("passed","Passed"),("failed","Failed"),("errored","Errored (did not run)")] %}
+  <div class="metric"><div class="lab">{{ label }}</div><div class="num md">{{ results.counts[k] }}</div></div>{% endfor %}
+  <div class="metric"><div class="lab">Privacy leaks</div><div class="num md">{{ results.privacy_leaks }}</div><span class="tag sim">Simulated</span></div>
+</div>
+<h3>Scenario matrix · {{ results.run_at }} · {{ results.mode }}</h3>
+<table><thead><tr><th>Scenario</th><th>Persona</th><th>Lang</th><th>Result</th><th>Checks</th></tr></thead><tbody>
+{% for s in results.scenarios %}
+<tr><td class="mono">{{ s.id }}</td><td>{{ s.persona }}</td><td>{{ s.language }}</td>
+<td>{% if s.status == 'pass' %}<span class="st ok">✓ pass</span>{% elif s.status == 'errored' %}<span class="st off">⟳ errored</span>{% else %}<span class="st un">✕ fail</span>{% endif %}</td>
+<td style="font-size:13px">{% for c, ok in s.checks.items() %}<span class="{{ 'st ok' if ok else 'st un' }}" style="font-size:12px">{{ '✓' if ok else '✕' }} {{ c }}</span> {% endfor %}</td></tr>
+{% endfor %}</tbody></table>
+<h3>Leak detector known-answer set</h3>
+<p>{{ results.leak_detector.caught }}/{{ results.leak_detector.planted }} planted leaks caught · {{ results.leak_detector.false_alarms }} false alarms on {{ results.leak_detector.clean }} clean transcripts.</p>
+{% endif %}
+<p class="muted" style="font-size:13px;margin-top:24px">What a text test can't measure: hearing difficulty, voicemail detection, real voice latency. Those are reported only from recorded demo calls (docs/08).</p>
+{% endblock %}
