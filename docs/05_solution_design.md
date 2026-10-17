@@ -39,7 +39,7 @@ flowchart LR
         SWEEP["Timer sweep<br/>(per request + cron)"]
         SVC["Service layer<br/>slotback/services/"]
         DOM["Pure domain<br/>transition-table state machine"]
-        LEDGER["slotledger<br/>record_and_apply · verify · sign_head"]
+        LEDGER["voiceledger<br/>record_and_apply · verify · sign_head"]
         CAMP["Campaign runner"]
         DASH["Dashboard (8 pages)<br/>read-only in public"]
         REG["metrics/registry.json"]
@@ -80,7 +80,7 @@ flowchart LR
 | Timer sweep | service layer + `.github/workflows/sweep.yml` | Expires 10-minute holds, advances backfill to the next rank, marks slots unfilled when out of time. Runs on every request and from a GitHub Actions cron every 5 min | EOV1 |
 | Service layer | `slotback/services/` | Orchestrates domain + ledger + DB in one transaction per tool call; at most 2 DB round trips per tool | 1B, D10 |
 | Domain | `slotback/domain/` | Pure, in-memory state machine as a transition table; fake clock injected; property-tested with Hypothesis | D19, D20, D22, EOV6 |
-| `slotledger` | `packages/slotledger/` | Standalone package, no Slotback imports: `record_and_apply`, per-hospital-per-day hash chain, `verify`, `sign_head` (Ed25519), bundle export, `slotledger verify` CLI | D10, D27, 4B, E2 |
+| `voiceledger` | voiceops kit (`slotback/ledger.py` binds it) | Standalone package, no Slotback imports: `record_and_apply`, per-hospital-per-day hash chain, `verify` with rules from `voiceops.toml`, `sign_head` (Ed25519), bundle export, `voiceledger verify` CLI | D10, D27, 4B, E2 |
 | Campaign runner | `slotback/services/` (campaign module; path indicative) | Builds the day's call list; one call per appointment per campaign day (unique key); calling window Mon–Sat 09:00–20:00 Europe/Madrid; max 2 attempts; demo allow-list = the developer's own phone only | D18, D8 |
 | Dashboard | `slotback/dashboard/` | 8 pages (landing, impact, console, call detail, ROI, evals, verify, try). Public = read-only; actions behind the access code and logged | D17, D28, 3A |
 | Metrics registry | `metrics/registry.json` | Every number with its provenance tag; dashboard reads it; docs and readout use `{{metric:...}}` placeholders; CI fails on stale or unfilled ones | 2C, D28 |
@@ -122,7 +122,7 @@ The state machine is a transition table in `slotback/domain/`. Any move not in t
 - **What it records:** every state change above, every identity attempt (pass and fail, D13), every list snapshot used for an offer, and `attended` outcomes.
 - **Chain:** one hash chain per hospital per day (4B). Each event stores the hash of the previous one. `record_and_apply()` writes the slot change and the event in one transaction (D10); a property test asserts the ledger and the slot table always agree.
 - **Signed head:** at day close, the last hash is signed with Ed25519 into `head.json`, which is handed to the hospital and stored outside the app database. A missing signing key means the head is not signed and the UI shows an UNSIGNED banner (D14).
-- **Bundle:** `ledger.jsonl` + `list_snapshots.jsonl` + `head.json`. `slotledger verify <bundle>` and the `/verify` page check the hash chain, the signed head, list order (offers went to ranks in order) and identity-before-detail. A ledger-only upload reports "list order: not checked (no snapshots)".
+- **Bundle:** `ledger.jsonl` + `list_snapshots.jsonl` + `head.json`. `voiceledger verify <bundle> --rules voiceops.toml` and the `/verify` page check the hash chain, the signed head, list order (offers went to ranks in order) and identity-before-detail. A ledger-only upload reports "list order: not checked (no snapshots)".
 - **Persistence:** bundles are stored in Postgres; the showcase day's bundle is also committed under `evidence/` (OV6, EOV7).
 - **What it does not prove (OV2).** A ledger signed by the vendor shows that the record was not rewritten after the hospital received the head. It does not prove the events were true. The hospital's booking system remains the source of truth, and billing reconciles against it daily (`04_business_case.md`).
 
@@ -134,7 +134,7 @@ sequenceDiagram
     participant E as ElevenLabs agent
     participant P as Patient
     participant T as Tool webhooks
-    participant L as slotledger + Postgres
+    participant L as voiceledger + Postgres
     participant H as Post-call webhook
 
     C->>T: issue per-call token (bound to pid)
@@ -247,7 +247,7 @@ Merged from the two registries in the build plan. "Test" means an automated test
 | `appointments` | `Appointment` | `id` ← `appointment_id`; `status`: `booked` (scheduled), `booked` + confirmation extension (confirmed), `cancelled`, `fulfilled` (attended), `noshow`; `slot` → `Slot`; `participant.actor` → `Patient`; `created` ← `booked_on`; `serviceType` ← specialty | Reschedule = old `cancelled` + new `booked`, written as one transaction (FHIR `Bundle` of type `transaction`) |
 | `patients` | `Patient` | `id` ← `pid`; `name`; `birthDate`; `identifier` (ID number, masked in reads); `telecom` (phone); `communication.language` | Reads return only what the console needs; ID number never returned in full |
 | `waitlist_entries` | `ServiceRequest` (referral) **or** `List` | `ServiceRequest`: `subject`, `authoredOn` ← `referred_on`, `priority` ← `routine`/`urgent` mapped from `ordinaria`/`preferente`; order carried by a `List` with `entry` in rank order | The order belongs to the hospital; Slotback reads it, snapshots it, never writes it |
-| Ledger event | `AuditEvent` / `Provenance` (candidate) | `recorded`, `agent`, `entity` → Appointment/Slot | Optional; the hash chain stays in `slotledger` |
+| Ledger event | `AuditEvent` / `Provenance` (candidate) | `recorded`, `agent`, `entity` → Appointment/Slot | Optional; the hash chain stays in `voiceledger` |
 
 ---
 

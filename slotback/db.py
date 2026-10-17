@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 
 import psycopg
-from slotledger import pg as ledger_pg
+from voiceledger import pg as ledger_pg
 
 SCHEMA_SQL = Path(__file__).resolve().parent.parent / "db" / "schema.sql"
 

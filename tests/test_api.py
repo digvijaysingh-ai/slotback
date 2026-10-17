@@ -13,9 +13,9 @@ import psycopg
 import pytest
 from fastapi.testclient import TestClient
 from psycopg.conninfo import make_conninfo
-from slotledger import sign_head, write_bundle
-from slotledger.pg import load_events, load_snapshots
-from slotledger.sign import new_private_key_hex
+from voiceledger import sign_head, write_bundle
+from voiceledger.pg import load_events, load_snapshots
+from voiceledger.sign import new_private_key_hex
 
 from slotback.api.app import Settings, create_app, verify_signature
 from slotback.data.generate import generate_day

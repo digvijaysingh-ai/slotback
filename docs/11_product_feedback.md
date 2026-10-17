@@ -56,7 +56,7 @@ Ranking = how often we expect the gap to block or slow a regulated outbound depl
 
 - **Request:** an optional tamper-evident, per-agent outcome log: hash-chained tool results and outcomes, with a signed daily head the customer can hold and verify.
 - **Why:** outcome-based pricing (pay per recovered slot, per resolved case) needs evidence both sides trust. In the vendor pages we found for appointment backfill, fill rates were quoted with no stated method or audit trail (search of 2026-10-16). A platform-level ledger would make outcome pricing easier to sell to public buyers, who must justify every payment.
-- **Evidence from this build:** we built it as `slotledger`. A vendor-signed ledger alone is circular as a bill, so billing still reconciles against the customer's own booking record; the ledger makes disputes cheap to settle.
+- **Evidence from this build:** we built it as a standalone ledger package (now `voiceledger`, part of the voiceops kit). A vendor-signed ledger alone is circular as a bill, so billing still reconciles against the customer's own booking record; the ledger makes disputes cheap to settle.
 
 ---
 

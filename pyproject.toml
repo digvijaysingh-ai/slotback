@@ -14,7 +14,8 @@ dependencies = [
     "python-multipart>=0.0.9",
     "jinja2>=3.1",
     "pgserver>=0.1.4",
-    "slotledger[pg]",
+    "voiceledger[postgres]",
+    "voiceops[fastapi,postgres]",
 ]
 
 [dependency-groups]
@@ -24,11 +25,11 @@ dev = [
     "ruff>=0.7",
 ]
 
+# The voiceops kit (ledger, agent build, guard, gate, deploy checks, call review).
+# Local checkout until voiceops is published; then these two lines go.
 [tool.uv.sources]
-slotledger = { workspace = true }
-
-[tool.uv.workspace]
-members = ["packages/slotledger"]
+voiceledger = { path = "../voiceops/packages/voiceledger", editable = true }
+voiceops = { path = "../voiceops/packages/voiceops", editable = true }
 
 [build-system]
 requires = ["hatchling"]
@@ -45,5 +46,5 @@ target-version = "py312"
 select = ["E", "F", "I", "B", "UP", "SIM"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "packages/slotledger/tests"]
+testpaths = ["tests"]
 markers = ["pg: needs a real Postgres server"]

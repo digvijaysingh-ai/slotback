@@ -2,8 +2,8 @@
 {% block title %}{{ t.verify_title }}{% endblock %}
 {% block main %}
 <div class="head"><h1>{{ t.verify_title }}</h1></div>
-<p class="lede muted" style="font-size:16px">Upload an evidence bundle (ledger + list snapshots + signed head). Nothing is stored. The check runs the same verifier as the command line: <span class="mono">slotledger verify bundle.zip</span>.</p>
-{% if static_mode %}<div class="alert" style="margin-top:20px"><b>Static snapshot.</b> Uploading needs the server version. Download the sample bundle and run <span class="mono">slotledger verify showcase-2026-10-16.zip --trusted-key KEY</span>, or see the report below, produced by the same verifier.</div>
+<p class="lede muted" style="font-size:16px">Upload an evidence bundle (ledger + list snapshots + signed head). Nothing is stored. The check runs the same verifier as the command line: <span class="mono">voiceledger verify bundle.zip --rules voiceops.toml</span>.</p>
+{% if static_mode %}<div class="alert" style="margin-top:20px"><b>Static snapshot.</b> Uploading needs the server version. Download the sample bundle and run <span class="mono">voiceledger verify showcase-2026-10-16.zip --trusted-key KEY --rules voiceops.toml</span>, or see the report below, produced by the same verifier.</div>
 <p><a class="btn" href="/evidence/showcase-2026-10-16.zip" download>Download the sample bundle ↓</a></p>
 <ul class="checks" id="static-report" data-src="verify-sample.json"></ul>
 {% else %}<form id="verify-form" class="drop" style="margin-top:20px">

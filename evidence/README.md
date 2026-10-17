@@ -11,14 +11,14 @@ A hospital can't pay per recovered slot unless it can check the work. Every step
 
 ```bash
 uv sync
-uv run slotledger verify evidence/showcase-2026-10-16.zip --trusted-key $(cat evidence/trusted_key.txt)
+uv run voiceledger verify evidence/showcase-2026-10-16.zip --trusted-key $(cat evidence/trusted_key.txt) --rules voiceops.toml
 ```
 
 ```
 PASS  1707 events
   PASS         chain: 1707 events linked
-  PASS         identity_before_detail: 300 disclosures, all after verification
-  PASS         list_order: 14 freed slots offered in list order
+  PASS         identity_before_detail: 300 detail_disclosed events, all after identity_verified
+  PASS         list_order: 14 snapshots followed in order (per slot_id)
   PASS         head: signed head matches
 ```
 
@@ -40,8 +40,8 @@ Change one patient ID in event #11 (an accepted offer) and verify again:
 ```
 FAIL  1707 events
   FAIL         chain at #11: event was changed after it was recorded
-  PASS         identity_before_detail: 300 disclosures, all after verification
-  FAIL         list_order at #11: patient at rank 1 does not match the hospital's list
+  PASS         identity_before_detail: 300 detail_disclosed events, all after identity_verified
+  FAIL         list_order at #11: pid at rank 1 does not match the snapshot
   PASS         head: signed head matches
 ```
 

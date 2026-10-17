@@ -15,10 +15,10 @@ from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-from slotledger.pg import load_events, load_snapshots
-from slotledger.verify import verify
+from voiceledger.pg import load_events, load_snapshots
 
 from slotback.dashboard.i18n import STRINGS
+from slotback.ledger import verify
 from slotback.services.scheduling import chain_id
 
 HERE = Path(__file__).resolve().parent

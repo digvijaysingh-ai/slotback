@@ -50,7 +50,7 @@ flowchart LR
     EL -- "signed post-call webhook" --> API
     API --> SVC[Scheduling services<br/>identity · confirm · cancel · move<br/>backfill state machine]
     SVC --> DB[(Postgres<br/>slots · appointments<br/>waiting list · calls)]
-    SVC --> L[slotledger<br/>hash chain + signed head]
+    SVC --> L[voiceledger<br/>hash chain + signed head]
     L --> V[Verifier CLI / Verify page]
     DB --> D[Dashboard<br/>Impact · Console · ROI · Evals]
 ```
@@ -77,13 +77,13 @@ flowchart LR
 ## Proof: verify the ledger yourself
 
 ```bash
-uv run slotledger verify evidence/showcase-2026-10-16.zip --trusted-key $(cat evidence/trusted_key.txt)
+uv run voiceledger verify evidence/showcase-2026-10-16.zip --trusted-key $(cat evidence/trusted_key.txt) --rules voiceops.toml
 ```
 ```
 PASS  1707 events
   PASS         chain: 1707 events linked
-  PASS         identity_before_detail: 300 disclosures, all after verification
-  PASS         list_order: 14 freed slots offered in list order
+  PASS         identity_before_detail: 300 detail_disclosed events, all after identity_verified
+  PASS         list_order: 14 snapshots followed in order (per slot_id)
   PASS         head: signed head matches
 ```
 
@@ -156,7 +156,7 @@ uv sync
 uv run pytest -q                          # 117 tests on real Postgres (embedded, no Docker needed)
 uv run python -m slotback.serve           # http://localhost:7860, rebuilds the showcase day on boot
 uv run python -m evals.run --only happy-confirm-es,race-two-patients   # tool-level evals, no credits
-uv run slotledger verify evidence/showcase-2026-10-16.zip --trusted-key $(cat evidence/trusted_key.txt)
+uv run voiceledger verify evidence/showcase-2026-10-16.zip --trusted-key $(cat evidence/trusted_key.txt) --rules voiceops.toml
 ```
 
 Copy `.env.example` to `.env` for the parts that need keys (pushing agents, conversation evals, phone calls). Secrets never go in the repo.
@@ -165,7 +165,7 @@ Copy `.env.example` to `.env` for the parts that need keys (pushing agents, conv
 
 ```
 slotback/            FastAPI app, scheduling services, backfill state machine, dashboard, simulator
-packages/slotledger/ the ledger: hash chain, signing, bundles, verifier CLI (its own package)
+voiceops.toml        the voiceops kit's config: ledger rules, agent build, eval gate, deploy checks, call review
 agent/               prompt fragments, profiles, built configs, push script
 evals/               scenarios, leak detector + known-answer set, ElevenLabs Tests runner, results
 evidence/            the signed showcase bundle and the trusted public key

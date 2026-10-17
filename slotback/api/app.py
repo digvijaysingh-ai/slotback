@@ -28,12 +28,12 @@ from fastapi import FastAPI, Header, HTTPException, Request, UploadFile
 from fastapi.responses import JSONResponse
 from psycopg_pool import ConnectionPool
 from pydantic import BaseModel
-from slotledger import BundleInvalid, read_bundle
-from slotledger import verify as verify_ledger
+from voiceledger import BundleInvalid, read_bundle
 
 from slotback.api.models import TOOLS
 from slotback.dashboard.routes import mount_dashboard
 from slotback.db import apply_schema
+from slotback.ledger import verify as verify_ledger
 from slotback.services import scheduling as svc
 
 log = logging.getLogger("slotback")

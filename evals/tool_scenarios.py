@@ -8,12 +8,12 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 
-from slotledger.pg import load_events, load_snapshots
-from slotledger.verify import verify
+from voiceledger.pg import load_events, load_snapshots
 
 from slotback.api.models import VerifyIdentity
 from slotback.data.generate import generate_day
 from slotback.data.seed import load_dataset
+from slotback.ledger import verify
 from slotback.services import scheduling as svc
 
 NOW = datetime(2026, 10, 14, 10, 0)

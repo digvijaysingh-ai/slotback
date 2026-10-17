@@ -17,9 +17,9 @@ from pathlib import Path
 
 import psycopg
 from dotenv import load_dotenv
-from slotledger import sign_head, write_bundle
-from slotledger.pg import load_events, load_snapshots
-from slotledger.sign import public_key_hex
+from voiceledger import sign_head, write_bundle
+from voiceledger.pg import load_events, load_snapshots
+from voiceledger.sign import public_key_hex
 
 from slotback.db import apply_schema
 from slotback.localdb import database_url

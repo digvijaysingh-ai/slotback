@@ -6,8 +6,9 @@ import threading
 
 import psycopg
 import pytest
-from slotledger.pg import apply_schema, load_events, record_and_apply
-from slotledger.verify import verify
+from voiceledger.pg import apply_schema, load_events, record_and_apply
+
+from slotback.ledger import verify
 
 CHAIN = "h1:2026-10-16"
 

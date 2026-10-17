@@ -20,9 +20,10 @@ import secrets
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
-from slotledger import pg as ledger
+from voiceledger import pg as ledger
 
 from slotback.domain import backfill as bf
+from slotback.ledger import EVENT_TYPES
 
 
 class ServiceError(Exception):
@@ -106,7 +107,15 @@ def _writable(conn, hospital_id: str) -> None:
 
 def _event(conn, hospital_id, now, type, actor="agent", payload=None, slot_id=None, apply=None):
     return ledger.record_and_apply(
-        conn, chain_id(conn, hospital_id), now.isoformat(), type, actor, payload, slot_id, apply
+        conn,
+        chain_id(conn, hospital_id),
+        now.isoformat(),
+        type,
+        actor,
+        payload,
+        slot_id,
+        apply,
+        types=EVENT_TYPES,
     )
 
 
@@ -537,7 +546,7 @@ def free_slot(
             (hospital_id, slot_id, "offering", snapshot_id, json.dumps(pids), 1),
         )
 
-    from slotledger.chain import snapshot_hash
+    from voiceledger.chain import snapshot_hash
 
     _event(
         conn,

@@ -19,7 +19,9 @@ from pathlib import Path
 import psycopg
 from fastapi.testclient import TestClient
 from psycopg.conninfo import make_conninfo
-from slotledger import read_bundle, verify
+from voiceledger import read_bundle
+
+from slotback.ledger import verify
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "dist" / "site"
