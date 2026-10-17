@@ -10,8 +10,7 @@ ENV HOME=/home/user PATH=/home/user/.local/bin:$PATH \
     PGDATA_DIR=/tmp/pg PORT=7860 UV_COMPILE_BYTECODE=1
 WORKDIR /home/user/app
 
-COPY --chown=user pyproject.toml uv.lock README.md ./
-COPY --chown=user packages ./packages
+COPY --chown=user pyproject.toml uv.lock README.md voiceops.toml ./
 RUN uv sync --frozen --no-dev --no-install-project
 
 COPY --chown=user slotback ./slotback

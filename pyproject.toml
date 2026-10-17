@@ -25,11 +25,11 @@ dev = [
     "ruff>=0.7",
 ]
 
-# The voiceops kit (ledger, agent build, guard, gate, deploy checks, call review).
-# Local checkout until voiceops is published; then these two lines go.
+# The voiceops kit (ledger, agent build, guard, gate, deploy checks, call review),
+# from its 0.1.0 GitHub release until it's on PyPI.
 [tool.uv.sources]
-voiceledger = { path = "../voiceops/packages/voiceledger", editable = true }
-voiceops = { path = "../voiceops/packages/voiceops", editable = true }
+voiceledger = { url = "https://github.com/digvijaysingh-ai/voiceops/archive/refs/tags/v0.1.0.tar.gz", subdirectory = "packages/voiceledger" }
+voiceops = { url = "https://github.com/digvijaysingh-ai/voiceops/archive/refs/tags/v0.1.0.tar.gz", subdirectory = "packages/voiceops" }
 
 [build-system]
 requires = ["hatchling"]

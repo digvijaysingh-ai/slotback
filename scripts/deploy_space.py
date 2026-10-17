@@ -30,7 +30,7 @@ INCLUDE = [
     "pyproject.toml",
     "uv.lock",
     "Dockerfile",
-    "packages",
+    "voiceops.toml",
     "slotback",
     "db",
     "evidence",
