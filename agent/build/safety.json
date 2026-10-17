@@ -1,0 +1,38 @@
+{
+  "inbound-demo": {
+    "ai_disclosure": "project: 10_disclosure",
+    "closing": "project: 80_language_and_close",
+    "human_on_request": "project: 70_human_and_optout",
+    "identity_before_detail": "project: 20_identity",
+    "no_unbacked_promises": "project: 50_actions",
+    "third_party_voicemail": "project: 30_privacy",
+    "upset_caller": "project: 15_upset"
+  },
+  "inbound-production-reference": {
+    "ai_disclosure": "project: 10_disclosure",
+    "closing": "project: 80_language_and_close",
+    "human_on_request": "project: 70_human_and_optout",
+    "identity_before_detail": "project: 20_identity",
+    "no_unbacked_promises": "project: 50_actions",
+    "third_party_voicemail": "project: 30_privacy",
+    "upset_caller": "project: 15_upset"
+  },
+  "outbound-demo": {
+    "ai_disclosure": "project: 10_disclosure",
+    "closing": "project: 80_language_and_close",
+    "human_on_request": "project: 70_human_and_optout",
+    "identity_before_detail": "project: 20_identity",
+    "no_unbacked_promises": "project: 50_actions",
+    "third_party_voicemail": "project: 30_privacy",
+    "upset_caller": "project: 15_upset"
+  },
+  "outbound-production-reference": {
+    "ai_disclosure": "project: 10_disclosure",
+    "closing": "project: 80_language_and_close",
+    "human_on_request": "project: 70_human_and_optout",
+    "identity_before_detail": "project: 20_identity",
+    "no_unbacked_promises": "project: 50_actions",
+    "third_party_voicemail": "project: 30_privacy",
+    "upset_caller": "project: 15_upset"
+  }
+}

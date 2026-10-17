@@ -1,6 +1,6 @@
 """Tool request models: the single source of truth for tool schemas (eng 2B).
 
-`agent/build.py` generates the ElevenLabs webhook-tool definitions from TOOLS, and
+`voiceops build` generates the ElevenLabs webhook-tool definitions from TOOLS, and
 CI fails if the committed definitions drift from these models.
 No model has a patient id field: tools act on the patient bound to the call token.
 """

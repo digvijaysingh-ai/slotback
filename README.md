@@ -142,7 +142,7 @@ The behaviour behind these numbers is **assumed, not measured**. The assumptions
 | Piece | Where |
 |---|---|
 | API, tool webhooks and dashboard | [slotback-api.onrender.com](https://slotback-api.onrender.com) (Render, Frankfurt; free tier, so the first load after idle takes about a minute) |
-| Two agents (outbound, inbound) | ElevenLabs Agents, pushed from `agent/` by `agent/push.py` |
+| Two agents (outbound, inbound) | ElevenLabs Agents, built and pushed from `agent/` by `voiceops build` / `voiceops push` |
 | Phone line | Twilio, imported into ElevenLabs; the dialler allows one number |
 | Post-call webhook | HMAC-signed, into `/hooks/post-call` |
 | CI | GitHub Actions: lint, format, config drift, metrics check, 117 tests on Postgres 16, 12 tool-level eval scenarios |
@@ -166,7 +166,7 @@ Copy `.env.example` to `.env` for the parts that need keys (pushing agents, conv
 ```
 slotback/            FastAPI app, scheduling services, backfill state machine, dashboard, simulator
 voiceops.toml        the voiceops kit's config: ledger rules, agent build, eval gate, deploy checks, call review
-agent/               prompt fragments, profiles, built configs, push script
+agent/               prompt fragments, profiles, built configs (`voiceops build`) and safety.json
 evals/               scenarios, leak detector + known-answer set, ElevenLabs Tests runner, results
 evidence/            the signed showcase bundle and the trusted public key
 demo/                real call recordings with annotated transcripts

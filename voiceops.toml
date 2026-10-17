@@ -6,6 +6,46 @@
 name = "slotback"
 locales = ["es", "en", "ro", "ar"]
 
+[agent]
+fragments = "agent/fragments"
+profiles = "agent/profiles.json"
+build_dir = "agent/build"
+tools = "slotback.api.models:TOOLS"
+language = "es"
+# LLM pinned: the platform default drifted to a model we never chose.
+llm = "claude-haiku-4-5"
+temperature = 0.2
+# Native Spain-Spanish voice (peninsular): the default English voice mangled Spanish on the
+# first phone call. "Carolina", ElevenLabs voice library, es / peninsular.
+voice_id = "UOIqAnmS11Reiei1Ytkc"
+tts_model = "eleven_flash_v2_5"
+tool_timeout_secs = 10
+end_call_description = "End the call after log_outcome and goodbye."
+# Clinical safety is Slotback's own rule on top of the kit's safety slots.
+required_fragments = ["40_clinical"]
+
+# The kit's safety slots, each reworded by Slotback's own (Spanish-first) fragment.
+[agent.safety]
+ai_disclosure = "10_disclosure"
+upset_caller = "15_upset"
+identity_before_detail = "20_identity"
+third_party_voicemail = "30_privacy"
+no_unbacked_promises = "50_actions"
+human_on_request = "70_human_and_optout"
+closing = "80_language_and_close"
+
+[agent.directions.outbound]
+first_message = "Hola, le llamo del Hospital General. Soy un asistente de inteligencia artificial y esta llamada se graba. Llamo por una cita: ¿hablo con la persona titular de la cita?"
+phone_audio = true  # telephone codec in and out (no resampling on Twilio)
+
+[agent.directions.inbound]
+first_message = "Hola, Hospital General. Soy un asistente de inteligencia artificial y esta llamada se graba. ¿En qué puedo ayudarle?"
+exclude_tools = ["offer_backfill", "accept_backfill", "decline_backfill"]
+
+[push]
+secret_name = "slotback_tool_secret"
+state = "agent/state.json"
+
 # Slotback's two domain checks, as generic ledger rules.
 # No appointment detail on a call before that call's identity check passed.
 [[ledger.rules]]
