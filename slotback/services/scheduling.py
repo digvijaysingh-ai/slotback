@@ -16,11 +16,11 @@ All functions take `now` explicitly (fake clock in tests, D22).
 from __future__ import annotations
 
 import json
-import secrets
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
 from voiceledger import pg as ledger
+from voiceops.guard import PgTokenStore, UnknownToken, new_call_id, new_token
 
 from slotback.domain import backfill as bf
 from slotback.ledger import EVENT_TYPES
@@ -119,15 +119,27 @@ def _event(conn, hospital_id, now, type, actor="agent", payload=None, slot_id=No
     )
 
 
+TOKENS = PgTokenStore(
+    "calls", subject="pid", extra=("hospital_id", "purpose", "slot_id", "rank", "identity_failures")
+)
+
+
 def resolve(conn, token: str) -> CallCtx:
-    row = conn.execute(
-        "SELECT call_id, hospital_id, pid, purpose, slot_id, rank, verified, identity_failures"
-        " FROM calls WHERE token = %s AND ended_at IS NULL",
-        (token,),
-    ).fetchone()
-    if row is None:
-        raise Unauthorized("unknown or finished call")
-    return CallCtx(*row)
+    try:
+        t = TOKENS.resolve(conn, token)
+    except UnknownToken as e:
+        raise Unauthorized("unknown or finished call") from e
+    x = t.extra
+    return CallCtx(
+        t.call_id,
+        x["hospital_id"],
+        t.subject,
+        x["purpose"],
+        x["slot_id"],
+        x["rank"],
+        t.verified,
+        x["identity_failures"],
+    )
 
 
 def _require_verified(ctx: CallCtx) -> None:
@@ -179,8 +191,7 @@ def start_call(
         if b.current_pid != pid:
             raise NotEligible(f"{pid} is not next on the list for {slot_id}")
         rank = b.rank
-    call_id = f"call_{secrets.token_hex(8)}"
-    token = secrets.token_urlsafe(24)
+    call_id, token = new_call_id(), new_token()
     try:
         conn.execute(
             "INSERT INTO calls (call_id, token, hospital_id, pid, purpose, slot_id, rank,"
@@ -250,9 +261,7 @@ def verify_identity(
         return _identity_fail(conn, ctx, now)
 
     def bind(c):
-        c.execute(
-            "UPDATE calls SET verified = true, pid = %s WHERE call_id = %s", (match, ctx.call_id)
-        )
+        TOKENS.bind(c, ctx.call_id, match)
 
     payload = {"call_id": ctx.call_id, "pid": match}
     if ctx.rank is not None:

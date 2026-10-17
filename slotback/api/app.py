@@ -10,8 +10,6 @@ Logs are JSON with only pid / call_id / tool / outcome / latency (D24): no names
 dates of birth, ID digits or specialty ever reach a log line.
 """
 
-import hashlib
-import hmac
 import json
 import logging
 import os
@@ -24,11 +22,13 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from fastapi import FastAPI, Header, HTTPException, Request, UploadFile
+from fastapi import Depends, FastAPI, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 from psycopg_pool import ConnectionPool
 from pydantic import BaseModel
 from voiceledger import BundleInvalid, read_bundle
+from voiceops.guard import RateLimiter, SafeLog, secret_matches, verify_webhook
+from voiceops.guard.fastapi import ToolGuard, rate_limited, signed_webhook
 
 from slotback.api.models import TOOLS
 from slotback.dashboard.routes import mount_dashboard
@@ -38,7 +38,6 @@ from slotback.services import scheduling as svc
 
 log = logging.getLogger("slotback")
 MADRID = ZoneInfo("Europe/Madrid")
-SIGNATURE_TOLERANCE_S = 30 * 60
 
 
 def madrid_now() -> datetime:
@@ -94,39 +93,8 @@ class Stats:
         return out
 
 
-class RateLimiter:
-    def __init__(self, per_minute: int):
-        self.per_minute = per_minute
-        self.hits: dict[str, deque] = defaultdict(deque)
-
-    def check(self, key: str) -> None:
-        now = time.monotonic()
-        q = self.hits[key]
-        while q and now - q[0] > 60:
-            q.popleft()
-        if len(q) >= self.per_minute:
-            raise HTTPException(429, "too many requests")
-        q.append(now)
-
-
-def _jlog(**fields) -> None:
-    allowed = {"event", "tool", "call_id", "pid", "outcome", "latency_ms", "status", "path"}
-    log.info(json.dumps({k: v for k, v in fields.items() if k in allowed and v is not None}))
-
-
-def verify_signature(secret: str, header: str | None, body: bytes, now: float) -> bool:
-    """ElevenLabs-Signature: t=<unix>,v0=<hex hmac_sha256(secret, f"{t}.{body}")>."""
-    if not secret or not header:
-        return False
-    parts = dict(p.split("=", 1) for p in header.split(",") if "=" in p)
-    try:
-        t = int(parts["t"])
-    except (KeyError, ValueError):
-        return False
-    if abs(now - t) > SIGNATURE_TOLERANCE_S:
-        return False
-    expected = hmac.new(secret.encode(), f"{t}.".encode() + body, hashlib.sha256).hexdigest()
-    return hmac.compare_digest(expected, parts.get("v0", ""))
+_jlog = SafeLog(log, extra_fields={"pid"})
+verify_signature = verify_webhook
 
 
 def _call_tool(name: str, conn, token: str, body: BaseModel, now: datetime) -> dict:
@@ -161,9 +129,9 @@ class SessionRequest(BaseModel):
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or Settings.from_env()
     stats = Stats()
-    tool_limiter = RateLimiter(per_minute=120)
-    upload_limiter = RateLimiter(per_minute=10)
-    session_limiter = RateLimiter(per_minute=5)
+    guard = ToolGuard(settings.tool_secret, _jlog, limiter=RateLimiter(per_minute=120))
+    upload_limited = Depends(rate_limited(RateLimiter(per_minute=10)))
+    session_limited = Depends(rate_limited(RateLimiter(per_minute=5)))
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -180,24 +148,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = settings
     app.state.stats = stats
 
-    def check_tool_secret(value: str | None) -> None:
-        if not value or not hmac.compare_digest(value, settings.tool_secret):
-            _jlog(event="tool_rejected", status=401)
-            raise HTTPException(401, "missing or invalid tool secret")
-
     for tool_name, (model, _desc) in TOOLS.items():
 
         def make(name=tool_name, Model=model):
             async def endpoint(
                 body: Model,  # type: ignore[valid-type]
-                request: Request,
-                x_tool_secret: str | None = Header(default=None),
-                x_call_token: str | None = Header(default=None),
+                x_call_token: str = Depends(guard.tool_call),
             ):
-                check_tool_secret(x_tool_secret)
-                tool_limiter.check(request.client.host if request.client else "?")
-                if not x_call_token:
-                    raise HTTPException(401, "missing call token")
                 started = time.perf_counter()
                 ok, call_id = True, None
                 try:
@@ -235,11 +192,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return {"ok": True, "hospitals": n}
 
     @app.post("/hooks/post-call")
-    async def post_call(request: Request, elevenlabs_signature: str | None = Header(default=None)):
-        raw = await request.body()
-        if not verify_signature(settings.webhook_secret, elevenlabs_signature, raw, time.time()):
-            _jlog(event="webhook_rejected", status=401)
-            raise HTTPException(401, "bad signature")
+    async def post_call(raw: bytes = Depends(signed_webhook(settings.webhook_secret, _jlog))):
         event = json.loads(raw)
         data = event.get("data", {})
         dyn = (data.get("conversation_initiation_client_data") or {}).get("dynamic_variables", {})
@@ -277,19 +230,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         _jlog(event="post_call", call_id=call_id, outcome=outcome)
         return {"ok": True, **res}
 
-    @app.post("/hooks/sweep")
-    def sweep(x_tool_secret: str | None = Header(default=None)):
-        check_tool_secret(x_tool_secret)
+    @app.post("/hooks/sweep", dependencies=[Depends(guard.require_secret)])
+    def sweep():
         with app.state.pool.connection() as conn:
             return {"ok": True, **svc.sweep(conn, settings.live_hospital, settings.clock())}
 
     def check_access(code: str) -> None:
-        if not settings.access_code or not hmac.compare_digest(code, settings.access_code):
+        if not secret_matches(code, settings.access_code):
             raise HTTPException(403, "wrong access code")
 
-    @app.post("/api/sessions")
-    def new_session(req: SessionRequest, request: Request):
-        session_limiter.check(request.client.host if request.client else "?")
+    @app.post("/api/sessions", dependencies=[session_limited])
+    def new_session(req: SessionRequest):
         check_access(req.access_code)
         if req.purpose not in ("inbound", "confirm"):
             raise HTTPException(400, "sessions are inbound (widget) or confirm (demo phone call)")
@@ -308,9 +259,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             )
         return {"call_id": call_id, "call_token": token}
 
-    @app.post("/api/verify")
-    async def verify_upload(file: UploadFile, request: Request, trusted_key: str | None = None):
-        upload_limiter.check(request.client.host if request.client else "?")
+    @app.post("/api/verify", dependencies=[upload_limited])
+    async def verify_upload(file: UploadFile, trusted_key: str | None = None):
         data = await file.read(5 * 1024 * 1024 + 1)
         try:
             events, snapshots, head = read_bundle(data)
