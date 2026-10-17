@@ -155,7 +155,7 @@ The live **Try** page (browser voice session) is behind an access code to protec
 uv sync
 uv run pytest -q                          # 117 tests on real Postgres (embedded, no Docker needed)
 uv run python -m slotback.serve           # http://localhost:7860, rebuilds the showcase day on boot
-uv run python -m evals.run --only happy-confirm-es,race-two-patients   # tool-level evals, no credits
+uv run voiceops gate --level tool          # tool-level evals, no credits
 uv run voiceledger verify evidence/showcase-2026-10-16.zip --trusted-key $(cat evidence/trusted_key.txt) --rules voiceops.toml
 ```
 

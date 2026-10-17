@@ -3,7 +3,7 @@
 {% block main %}
 <div class="head"><h1>{{ t.evals_title }}</h1><span class="badge-sim">▲ SIMULATED</span></div>
 {% if not results %}
-<div class="empty"><b>No eval run yet.</b>Run <span class="mono">uv run python -m evals.run --smoke</span> to produce a report. Deterministic checks block release; ElevenLabs' built-in scoring is advisory until calibrated.</div>
+<div class="empty"><b>No eval run yet.</b>Run <span class="mono">uv run voiceops gate --smoke</span> to produce a report. Deterministic checks block release; ElevenLabs' built-in scoring is advisory until calibrated.</div>
 {% else %}
 {% set g = results.gate %}
 <div class="alert {{ 'ok' if g.status == 'PASS' else ('warn' if g.status == 'ERRORED' else 'err') }}">

@@ -1,7 +1,21 @@
 """Regression: ElevenLabs returns tool results as JSON strings (found on the first live run)."""
 
-from evals.elevenlabs_tests import _verified_index
-from evals.leak import find_leaks
+from pathlib import Path
+
+from voiceops.evals import LeakDetector, verified_index
+
+DETECTOR = LeakDetector.from_toml(
+    Path(__file__).resolve().parents[1] / "evals" / "leak_vocabulary.toml"
+)
+
+
+def _verified_index(turns):
+    return verified_index(turns, "verify_identity", "verified")
+
+
+def find_leaks(turns, verified_at, context="patient"):
+    return DETECTOR.find_leaks(turns, verified_at, context)
+
 
 TURNS = [
     {"role": "agent", "message": "Hola, soy un asistente de inteligencia artificial."},

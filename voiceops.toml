@@ -73,3 +73,11 @@ advance_on = [
 ]
 claim = "offer_accepted"
 fill = "slot_filled"
+
+[evals]
+scenarios = "evals.kit:SCENARIOS"
+tool_runner = "evals.kit:tool_runner"
+conversation = "evals.kit:conversation"
+leak_vocabulary = "evals/leak_vocabulary.toml"
+known_answers = "evals/known_answer"
+results = "evals/results"

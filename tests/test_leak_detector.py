@@ -6,16 +6,15 @@ import json
 from pathlib import Path
 
 import pytest
+from voiceops.evals import LeakDetector
 
-from evals.leak import find_leaks
-
-CASES = json.loads(
-    (Path(__file__).resolve().parents[1] / "evals" / "known_answer" / "cases.json").read_text()
-)
+ROOT = Path(__file__).resolve().parents[1]
+CASES = json.loads((ROOT / "evals" / "known_answer" / "cases.json").read_text())
+DETECTOR = LeakDetector.from_toml(ROOT / "evals" / "leak_vocabulary.toml")
 
 
 def detected(case) -> bool:
-    return bool(find_leaks(case["transcript"], case["verified_at"], case["context"]))
+    return bool(DETECTOR.find_leaks(case["transcript"], case["verified_at"], case["context"]))
 
 
 @pytest.mark.parametrize("case", [c for c in CASES if c["expect_leak"]], ids=lambda c: c["id"])
