@@ -38,9 +38,10 @@
   "outbound-production-reference": {
     "name": "Slotback · outbound · production reference",
     "direction": "outbound",
+    "first_message": "Hola, le llamo del Hospital General. Soy un asistente de inteligencia artificial. Llamo por una cita: ¿hablo con la persona titular de la cita?",
     "fragments": [
       "00_role",
-      "10_disclosure",
+      "10_disclosure_unrecorded",
       "15_upset",
       "20_identity",
       "30_privacy",
@@ -56,9 +57,10 @@
   "inbound-production-reference": {
     "name": "Slotback · inbound · production reference",
     "direction": "inbound",
+    "first_message": "Hola, Hospital General. Soy un asistente de inteligencia artificial. ¿En qué puedo ayudarle?",
     "fragments": [
       "00_role",
-      "10_disclosure",
+      "10_disclosure_unrecorded",
       "15_upset",
       "20_identity",
       "30_privacy",

@@ -9,7 +9,7 @@
     "upset_caller": "project: 15_upset"
   },
   "inbound-production-reference": {
-    "ai_disclosure": "project: 10_disclosure",
+    "ai_disclosure": "project: 10_disclosure_unrecorded",
     "closing": "project: 80_language_and_close",
     "human_on_request": "project: 70_human_and_optout",
     "identity_before_detail": "project: 20_identity",
@@ -27,7 +27,7 @@
     "upset_caller": "project: 15_upset"
   },
   "outbound-production-reference": {
-    "ai_disclosure": "project: 10_disclosure",
+    "ai_disclosure": "project: 10_disclosure_unrecorded",
     "closing": "project: 80_language_and_close",
     "human_on_request": "project: 70_human_and_optout",
     "identity_before_detail": "project: 20_identity",

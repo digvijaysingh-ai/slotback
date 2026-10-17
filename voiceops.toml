@@ -26,7 +26,8 @@ required_fragments = ["40_clinical"]
 
 # The kit's safety slots, each reworded by Slotback's own (Spanish-first) fragment.
 [agent.safety]
-ai_disclosure = "10_disclosure"
+# Profiles that record say so; production-reference profiles record nothing.
+ai_disclosure = ["10_disclosure", "10_disclosure_unrecorded"]
 upset_caller = "15_upset"
 identity_before_detail = "20_identity"
 third_party_voicemail = "30_privacy"

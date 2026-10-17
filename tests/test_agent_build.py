@@ -13,7 +13,6 @@ from slotback.api.models import TOOLS
 ROOT = Path(__file__).resolve().parents[1]
 CFG = load_config(ROOT / "voiceops.toml")
 FRAGMENTS = CFG.path(CFG.agent.fragments)
-SAFETY_FRAGMENTS = [*CFG.agent.safety.values(), *CFG.agent.required_fragments]
 
 
 @pytest.fixture(scope="module")
@@ -31,20 +30,28 @@ def test_every_kit_safety_slot_is_met_by_a_slotback_fragment(files):
 
 
 def test_every_profile_contains_every_safety_rule_verbatim(files):
+    """Each kit slot is met by a Slotback fragment (safety.json); that text is in the prompt."""
+    safety = json.loads(files["safety.json"])
     for name, text in files.items():
         if name in ("tools.json", "safety.json"):
             continue
         prompt = json.loads(text)["conversation_config"]["agent"]["prompt"]["prompt"]
-        for frag in SAFETY_FRAGMENTS:
+        used = [how.removeprefix("project: ") for how in safety[name[:-5]].values()]
+        for frag in [*used, *CFG.agent.required_fragments]:
             assert (FRAGMENTS / f"{frag}.md").read_text().strip() in prompt, (name, frag)
 
 
-def test_first_message_discloses_ai_and_recording(files):
+def test_first_message_discloses_ai_and_recording_only_when_recording(files):
     for name, text in files.items():
         if name in ("tools.json", "safety.json"):
             continue
-        first = json.loads(text)["conversation_config"]["agent"]["first_message"].lower()
-        assert "inteligencia artificial" in first and "se graba" in first
+        config = json.loads(text)
+        first = config["conversation_config"]["agent"]["first_message"].lower()
+        prompt = config["conversation_config"]["agent"]["prompt"]["prompt"]
+        recorded = config["platform_settings"]["privacy"]["record_voice"]
+        assert "inteligencia artificial" in first
+        assert ("se graba" in first) == recorded, name
+        assert ("esta llamada se graba" in prompt) == recorded, name
 
 
 def test_production_reference_profiles_use_zero_retention(files):
