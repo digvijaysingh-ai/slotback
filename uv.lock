@@ -665,8 +665,8 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=1.0" },
     { name = "python-multipart", specifier = ">=0.0.9" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.32" },
-    { name = "voiceledger", extras = ["postgres"], url = "https://github.com/digvijaysingh-ai/voiceops/archive/refs/tags/v0.1.0.tar.gz", subdirectory = "packages/voiceledger" },
-    { name = "voiceops", extras = ["fastapi", "postgres"], url = "https://github.com/digvijaysingh-ai/voiceops/archive/refs/tags/v0.1.0.tar.gz", subdirectory = "packages/voiceops" },
+    { name = "voiceledger", extras = ["postgres"], url = "https://github.com/digvijaysingh-ai/voiceops/archive/refs/tags/v0.1.3.tar.gz", subdirectory = "packages/voiceledger" },
+    { name = "voiceops", extras = ["fastapi", "postgres"], url = "https://github.com/digvijaysingh-ai/voiceops/archive/refs/tags/v0.1.3.tar.gz", subdirectory = "packages/voiceops" },
 ]
 
 [package.metadata.requires-dev]
@@ -782,12 +782,12 @@ wheels = [
 
 [[package]]
 name = "voiceledger"
-version = "0.1.0"
-source = { url = "https://github.com/digvijaysingh-ai/voiceops/archive/refs/tags/v0.1.0.tar.gz", subdirectory = "packages/voiceledger" }
+version = "0.1.3"
+source = { url = "https://github.com/digvijaysingh-ai/voiceops/archive/refs/tags/v0.1.3.tar.gz", subdirectory = "packages/voiceledger" }
 dependencies = [
     { name = "cryptography" },
 ]
-sdist = { hash = "sha256:0f088f651abe7959c185e94f67dac91ae71815d0503ed6f9c9188885fc16a062" }
+sdist = { hash = "sha256:780fd84b0ed09c552eb85a8666ffbc673c69b9ed9d2b54169092918662ab98ca" }
 
 [package.optional-dependencies]
 postgres = [
@@ -803,8 +803,8 @@ provides-extras = ["postgres"]
 
 [[package]]
 name = "voiceops"
-version = "0.1.0"
-source = { url = "https://github.com/digvijaysingh-ai/voiceops/archive/refs/tags/v0.1.0.tar.gz", subdirectory = "packages/voiceops" }
+version = "0.1.3"
+source = { url = "https://github.com/digvijaysingh-ai/voiceops/archive/refs/tags/v0.1.3.tar.gz", subdirectory = "packages/voiceops" }
 dependencies = [
     { name = "httpx" },
     { name = "pydantic" },
@@ -812,7 +812,7 @@ dependencies = [
     { name = "typer" },
     { name = "voiceledger" },
 ]
-sdist = { hash = "sha256:0f088f651abe7959c185e94f67dac91ae71815d0503ed6f9c9188885fc16a062" }
+sdist = { hash = "sha256:780fd84b0ed09c552eb85a8666ffbc673c69b9ed9d2b54169092918662ab98ca" }
 
 [package.optional-dependencies]
 fastapi = [
@@ -831,7 +831,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.7" },
     { name = "python-dotenv", specifier = ">=1.0" },
     { name = "typer", specifier = ">=0.12" },
-    { name = "voiceledger", specifier = ">=0.1.0" },
+    { name = "voiceledger", specifier = ">=0.1.3" },
     { name = "voiceledger", extras = ["postgres"], marker = "extra == 'postgres'" },
 ]
 provides-extras = ["fastapi", "postgres"]

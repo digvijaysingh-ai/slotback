@@ -26,10 +26,10 @@ dev = [
 ]
 
 # The voiceops kit (ledger, agent build, guard, gate, deploy checks, call review),
-# from its 0.1.0 GitHub release until it's on PyPI.
+# from its 0.1.3 GitHub release until it's on PyPI.
 [tool.uv.sources]
-voiceledger = { url = "https://github.com/digvijaysingh-ai/voiceops/archive/refs/tags/v0.1.0.tar.gz", subdirectory = "packages/voiceledger" }
-voiceops = { url = "https://github.com/digvijaysingh-ai/voiceops/archive/refs/tags/v0.1.0.tar.gz", subdirectory = "packages/voiceops" }
+voiceledger = { url = "https://github.com/digvijaysingh-ai/voiceops/archive/refs/tags/v0.1.3.tar.gz", subdirectory = "packages/voiceledger" }
+voiceops = { url = "https://github.com/digvijaysingh-ai/voiceops/archive/refs/tags/v0.1.3.tar.gz", subdirectory = "packages/voiceops" }
 
 [build-system]
 requires = ["hatchling"]
