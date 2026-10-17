@@ -72,7 +72,7 @@ flowchart LR
 | Offers only in the hospital's list order | Backfill state machine; ledger check `list_order` |
 | Opt-out of automated calls | `opt_out`; eval scenario `opt-out` |
 | Prompt injection can't widen access | Tools act only on the patient bound to the call; eval scenario `prompt-injection` |
-| Real calls only to one allow-listed number | `scripts/demo_call.py` |
+| Real calls only to one allow-listed number | `voiceops call` (`[review]` in `voiceops.toml`) |
 
 ## Proof: verify the ledger yourself
 
@@ -145,7 +145,7 @@ The behaviour behind these numbers is **assumed, not measured**. The assumptions
 | Two agents (outbound, inbound) | ElevenLabs Agents, built and pushed from `agent/` by `voiceops build` / `voiceops push` |
 | Phone line | Twilio, imported into ElevenLabs; the dialler allows one number |
 | Post-call webhook | HMAC-signed, into `/hooks/post-call` |
-| CI | GitHub Actions: lint, format, config drift, metrics check, 117 tests on Postgres 16, 12 tool-level eval scenarios |
+| CI | GitHub Actions: lint, format, config drift, metrics check, 103 tests on Postgres 16 (the ledger's tests run in the voiceops kit), 12 tool-level eval scenarios |
 
 The live **Try** page (browser voice session) is behind an access code to protect the call budget. The recordings in [`demo/`](demo/) show the same agent.
 
@@ -153,7 +153,7 @@ The live **Try** page (browser voice session) is behind an access code to protec
 
 ```bash
 uv sync
-uv run pytest -q                          # 117 tests on real Postgres (embedded, no Docker needed)
+uv run pytest -q                          # 103 tests on real Postgres (embedded, no Docker needed)
 uv run python -m slotback.serve           # http://localhost:7860, rebuilds the showcase day on boot
 uv run voiceops gate --level tool          # tool-level evals, no credits
 uv run voiceledger verify evidence/showcase-2026-10-16.zip --trusted-key $(cat evidence/trusted_key.txt) --rules voiceops.toml
@@ -167,13 +167,13 @@ Copy `.env.example` to `.env` for the parts that need keys (pushing agents, conv
 slotback/            FastAPI app, scheduling services, backfill state machine, dashboard, simulator
 voiceops.toml        the voiceops kit's config: ledger rules, agent build, eval gate, deploy checks, call review
 agent/               prompt fragments, profiles, built configs (`voiceops build`) and safety.json
-evals/               scenarios, leak detector + known-answer set, ElevenLabs Tests runner, results
+evals/               scenarios, gate hooks (`evals/kit.py`), leak vocabulary + known-answer set, results
 evidence/            the signed showcase bundle and the trusted public key
-demo/                real call recordings with annotated transcripts
+demo/                real call recordings with annotated transcripts and generated review sheets
 metrics/             every number with its provenance
 docs/                the deployment documents (see the table above)
 readout/             the executive readout and memo, Spanish and English
-scripts/             deploy, deploy check, demo call, metrics filler, static export
+scripts/             deploy, metrics filler, static export
 db/                  schema
 ```
 

@@ -158,7 +158,7 @@ Text tests send text to the agent and read text back. They do not exercise audio
 | Speech recognition on elderly Spanish speakers | No audio | 5–10 widget voice tests of the identity step (§8); pilot QA sampling |
 | Barge-in / interruptions | Turn-taking is audio-timed | P2 approximates in text; real check in widget tests |
 | Voicemail detection | Needs a real answering machine | Callback-only message tested in text; detection is a platform behaviour (Product memo) |
-| Real voice latency (end to end) | No audio pipeline, no telephony | Report "text-sim turn latency" only; server tool p95 measured by `deploy_check` |
+| Real voice latency (end to end) | No audio pipeline, no telephony | Report "text-sim turn latency" only; server tool p95 measured by `voiceops check` |
 | Background noise, accents, line quality | No audio | Pilot QA |
 | Voice and pace suitability | Subjective, audio | Widget sessions and phone calls with the developer playing synthetic personas |
 

@@ -84,7 +84,7 @@ flowchart LR
 | Campaign runner | `slotback/services/` (campaign module; path indicative) | Builds the day's call list; one call per appointment per campaign day (unique key); calling window Mon–Sat 09:00–20:00 Europe/Madrid; max 2 attempts; demo allow-list = the developer's own phone only | D18, D8 |
 | Dashboard | `slotback/dashboard/` | 8 pages (landing, impact, console, call detail, ROI, evals, verify, try). Public = read-only; actions behind the access code and logged | D17, D28, 3A |
 | Metrics registry | `metrics/registry.json` | Every number with its provenance tag; dashboard reads it; docs and readout use `{{metric:...}}` placeholders; CI fails on stale or unfilled ones | 2C, D28 |
-| Deploy check | `scripts/deploy_check.py` | Gates the agent push: health, seed counts, signed tool call, verifier, unsigned call rejected, tool p95 | D26 |
+| Deploy check | `voiceops check` (`[deploy]` in `voiceops.toml`) | Gates the agent push: health, seed counts, signed tool call, verifier, unsigned call rejected, pages, tool p95 | D26 |
 | Kill switch | console, behind access code | Stops the campaign runner and makes every tool return a "calling paused" response; banner shows who paused it and when | D17 |
 
 ### 3.1 Backfill state machine (D20)
@@ -220,8 +220,8 @@ Merged from the two registries in the build plan. "Test" means an automated test
 | `record_and_apply` | Crash between slot write and ledger write | One transaction (D10); no partial state | Crash injection | Consistent state | Yes |
 | `reschedule` | Hang-up mid-swap | Atomic swap (D19); patient keeps exactly one appointment | Persona + integration | Original or new appointment, never none | Yes |
 | Campaign runner | Rerun or restart | Unique key per appointment per day (D18) | Property: run twice → one call | Nobody called twice | Yes |
-| Tool webhook | Space asleep or response > 10 s | Filler phrase; apology + callback; wake script before demos | deploy_check | Apology + callback | Yes |
-| Tool webhook | No or invalid secret | 401, nothing changes (D11) | deploy_check | — | Yes |
+| Tool webhook | Space asleep or response > 10 s | Filler phrase; apology + callback; wake script before demos | `voiceops check` | Apology + callback | Yes |
+| Tool webhook | No or invalid secret | 401, nothing changes (D11) | `voiceops check` | — | Yes |
 | Post-call webhook | Bad signature or replay | Reject 401; dedup | Unit | Nothing changes | Yes |
 | Voicemail outcome | Voicemail does not fire `call_initiation_failure` | Read from transcript / termination reason / batch status; sweep advances backfill | Unit + persona | Callback-number-only message | Yes |
 | Timer sweep | Space asleep, cron missed | Next request runs the sweep | Fake-clock unit | Hold expires late (≤ 5 min) | Yes |
@@ -229,8 +229,8 @@ Merged from the two registries in the build plan. "Test" means an automated test
 | Eval isolation | Eval writes into the showcase day | One hospital ID per eval run; showcase read-only (EOV5) | After nightly run, showcase head hash unchanged | — | Yes |
 | Leak detector | Misses a leak | Known-answer set must be 100% caught, ≤ 2 false alarms (D21) | CI | Gate fails | Yes |
 | `sign_head` | Key missing | Refuse to sign (D14) | Unit | UNSIGNED banner | Yes |
-| Boot / seed | Seed fails | Health check fails loudly (D14) | deploy_check | "Demo server didn't start" | Yes |
-| Evidence | Restart wipes ledgers | Bundles in Postgres + `evidence/` (OV6) | deploy_check | Bundles persist | Yes |
+| Boot / seed | Seed fails | Health check fails loudly (D14) | `voiceops check` | "Demo server didn't start" | Yes |
+| Evidence | Restart wipes ledgers | Bundles in Postgres + `evidence/` (OV6) | `voiceops check` | Bundles persist | Yes |
 | Billing | Fill not attended or no matching hospital booking | Not billable; shown in reconciliation (OV2, OV3) | Unit | Reconciliation row | Yes |
 | Campaign | Kill switch pressed | Runner stops; tools answer "calling paused" | Playwright | Banner with who/when | Yes |
 | Waiting list | Stale list (patient already seen, deceased) | Production: list snapshot refreshed before each run, staff-maintained exclusions; agent never argues with the list | Discovery check (02 §3) | Staff-handled exception | Yes |
@@ -303,7 +303,7 @@ This is our reading for design purposes, not legal advice. The hospital's legal 
 
 - **Trace ID:** the ElevenLabs `conversation_id` is used on logs, ledger events and call records (D24).
 - **Logs:** JSON, with only `pid`, `call_id`, `tool`, `outcome`, `latency_ms`. Enforced by a test.
-- **Latency budget:** tool p95 ≤ 300 ms server time (design target, D23). Current value: <!--m:tool_latency_p95_ms-->0.9 ms (measured locally)<!--/m--> (measured locally through the API with embedded Postgres by `scripts/fill_metrics.py`; `deploy_check` re-measures on the hosted demo). The agent says a short filler phrase on slow tools.
+- **Latency budget:** tool p95 ≤ 300 ms server time (design target, D23). Current value: <!--m:tool_latency_p95_ms-->0.9 ms (measured locally)<!--/m--> (measured locally through the API with embedded Postgres by `scripts/fill_metrics.py`; `voiceops check` re-measures on the hosted demo). The agent says a short filler phrase on slow tools.
 - **Console alerts (4):** privacy flag on a call; transfer spike; webhook error rate > 5%; tool p95 > 300 ms. Runbook in `10_operations.md`.
 - **Gate:** deterministic eval gate (ledger verifier, leak detector, tool-call correctness, AI disclosure, read-back) blocks an agent push; ElevenLabs built-in evaluation is advisory (D9). Detail in `08_evals.md`.
 

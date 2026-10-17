@@ -81,3 +81,45 @@ conversation = "evals.kit:conversation"
 leak_vocabulary = "evals/leak_vocabulary.toml"
 known_answers = "evals/known_answer"
 results = "evals/results"
+
+[deploy]
+base_url = "env:SLOTBACK_API_URL"
+timeout_s = 60  # the free instance sleeps; the first request wakes it
+
+[[deploy.checks]]
+check = "health"
+at_least = { hospitals = 2 }
+
+[[deploy.checks]]
+check = "unsigned_refused"
+tool = "get_appointment"
+
+[[deploy.checks]]
+check = "signed_roundtrip"
+tool = "get_appointment"
+session = { path = "/api/sessions", body = { access_code = "env:DEMO_ACCESS_CODE" } }
+expect = { error = "identity_not_verified" }  # an unbound token must not get detail
+
+[[deploy.checks]]
+check = "ledger_verifies"
+bundle = "evidence/showcase-2026-10-16.zip"
+trusted_key = "evidence/trusted_key.txt"
+
+[[deploy.checks]]
+check = "pages"
+paths = ["/", "/impact", "/console", "/roi", "/evals", "/verify", "/try"]
+
+[[deploy.checks]]
+check = "p95"
+budget_ms = 300
+
+[review]
+profile = "outbound-demo"
+api_url = "env:SLOTBACK_API_URL"
+session = { path = "/api/sessions", body = { access_code = "env:DEMO_ACCESS_CODE", purpose = "confirm" } }
+instructions = "evals.kit:call_instructions"
+recordings = "recordings"
+sheets = "demo/review"
+disclosure_markers = ["inteligencia artificial", "ai assistant", "artificial"]
+leak_context = "patient"
+unbacked_promises = ["correo", "email", "sms", "mensaje de texto", "por carta"]
