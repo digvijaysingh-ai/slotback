@@ -14,8 +14,8 @@ dependencies = [
     "python-multipart>=0.0.9",
     "jinja2>=3.1",
     "pgserver>=0.1.4",
-    "voiceledger[postgres]",
-    "voiceops[fastapi,postgres]",
+    "voiceledger[postgres]>=0.1.3",
+    "voiceops[fastapi,postgres]>=0.1.3",
 ]
 
 [dependency-groups]
@@ -24,12 +24,6 @@ dev = [
     "hypothesis>=6.115",
     "ruff>=0.7",
 ]
-
-# The voiceops kit (ledger, agent build, guard, gate, deploy checks, call review),
-# from its 0.1.3 GitHub release until it's on PyPI.
-[tool.uv.sources]
-voiceledger = { url = "https://github.com/digvijaysingh-ai/voiceops/archive/refs/tags/v0.1.3.tar.gz", subdirectory = "packages/voiceledger" }
-voiceops = { url = "https://github.com/digvijaysingh-ai/voiceops/archive/refs/tags/v0.1.3.tar.gz", subdirectory = "packages/voiceops" }
 
 [build-system]
 requires = ["hatchling"]
