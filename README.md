@@ -6,6 +6,8 @@ A voice agent on [ElevenLabs Agents](https://elevenlabs.io/agents) calls patient
 
 This repository is the whole deployment, not just the voice demo: account research, discovery, use-case selection, business case and procurement route, solution design and DPIA, a working system, an eval gate, real phone calls, a pilot plan and an executive readout.
 
+Its reusable parts (the ledger, agent build, API guard, eval gate, deploy checks and call review) now live in [voiceops](https://github.com/digvijaysingh-ai/voiceops), an open-source kit extracted from this deployment; Slotback runs on it with no change in behaviour.
+
 [![core](https://github.com/digvijaysingh-ai/slotback/actions/workflows/core.yml/badge.svg)](https://github.com/digvijaysingh-ai/slotback/actions/workflows/core.yml)
 &nbsp; **[Live dashboard](https://slotback-api.onrender.com)** · **[Listen to a real call](demo/)** · **[Verify the ledger](evidence/)** · **[All documents](docs/)**
 
